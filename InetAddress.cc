@@ -12,7 +12,7 @@ InetAddress::InetAddress(uint16_t port, bool loopback)
 {
 	bzero(&addr_, sizeof(addr_));
 	addr_.sin_family = AF_INET;
-	in_addr_t ip = loopback ? INADDR_ANY : INADDR_LOOPBACK;
+	in_addr_t ip = loopback ? INADDR_LOOPBACK:INADDR_ANY;
 	addr_.sin_addr.s_addr = htonl(ip);
 	addr_.sin_port = htons(port);
 }
