@@ -3,6 +3,10 @@ project(tinyev)
 
 set(CMAKE_CXX_STANDARD 14)
 
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 set(SOURCE_FILES
 		EventLoop.cc EventLoop.h
 		EPoller.cc EPoller.h
