@@ -189,7 +189,7 @@ private:
 
 		if (!queens.empty()) {
 			// middle col
-			if (queens.size() % 2 == 1 &&
+			if (nQueen_ % 2 == 1 &&
 				queens[0] + 1 == (static_cast<uint>(nQueen_) + 1) / 2)
 				answer += count;
 			else
@@ -199,15 +199,15 @@ private:
 			answer += count;
 
 		totalResponse++;
+		if (totalResponse % 10 == 0) {
+			INFO("[%d/%d] sub problems solved, %ld answers found",
+				 totalResponse, totalRequest, answer);
+		}
 		if (totalResponse == totalRequest) {
 			INFO("answer of %d queen: %ld, %s",
 				 nQueen_, answer,
 				 answer == answerSheet[nQueen_] ? "right":"wrong");
 			client_.onError();
-		}
-		if (totalResponse % 10 == 0) {
-			INFO("[%d/%d] sub problems solved, %ld answers found",
-				 totalResponse, totalRequest, answer);
 		}
 
 		if (!requests_.empty())
@@ -216,31 +216,17 @@ private:
 
 	void initRequests()
 	{
-		if (nQueen_ <= 8) {
-			// no concurrency
-			requests_.push_back(std::to_string(nQueen_) + "\r\n");
-			totalRequest++;
-		}
-		else if (nQueen_ <= 15) {
-			// level 1 concurrency
-			for (int i = 0; i < (nQueen_ + 1) / 2; ++i) {
+
+		for (int i = 0; i < (nQueen_ + 1) / 2; ++i) {
+			for (int j = 0; j < nQueen_; ++j) {
 				requests_.push_back(std::to_string(nQueen_) + ' ' +
-											std::to_string(i) + "\r\n");
+									std::to_string(i) + ' ' +
+									std::to_string(j) + "\r\n");
 				totalRequest++;
 			}
 		}
-		else {
-			// level 2 concurrency
-			for (int i = 0; i < (nQueen_ + 1) / 2; ++i) {
-				for (int j = 0; j < nQueen_; ++j) {
-					requests_.push_back(std::to_string(nQueen_) + ' ' +
-							   std::to_string(i) + ' ' +
-							   std::to_string(j) + "\r\n");
-					totalRequest++;
-				}
-			}
-		}
 	}
+
 
 	void sendOneRequest(const TcpConnectionPtr& conn)
 	{
@@ -287,7 +273,7 @@ int main(int argc, char** argv)
 
 	EventLoop loop;
 	std::vector<InetAddress> peers = parseArgs(argc, argv);
-	NQueenSolver client(&loop, peers, 18);
+	NQueenSolver client(&loop, peers, 20);
 	client.start();
 	loop.loop();
 }
