@@ -11,7 +11,7 @@
 
 void defaultThreadInitCallback(size_t index)
 {
-	TRACE("thread #%lu started", index);
+	TRACE("eventLoop thread #%lu started", index);
 }
 
 void defaultConnectionCallback(const TcpConnectionPtr& conn)

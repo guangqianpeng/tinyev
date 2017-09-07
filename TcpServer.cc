@@ -44,7 +44,7 @@ void TcpServer::start()
 	assert(!started_);
 	started_ = true;
 
-	INFO("TcpServer::start() %s with %lu threads",
+	INFO("TcpServer::start() %s with %lu eventLoop threads",
 		 local_.toIpPort().c_str(), numThreads_);
 
 	for (size_t i = 0; i < numThreads_; ++i) {
