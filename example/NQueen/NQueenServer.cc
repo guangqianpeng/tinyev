@@ -182,11 +182,20 @@ private:
 	ThreadPool threadPool_;
 };
 
-int main(int , char** )
+int main(int argc, char** argv)
 {
 	setLogLevel(LOG_LEVEL_TRACE);
 
-	size_t threadPoolSize = std::thread::hardware_concurrency();
+	size_t threadPoolSize = 0;
+
+	if (argc == 2) {
+		int n = atoi(argv[1]);
+		if (n > 0)
+			threadPoolSize = static_cast<size_t>(n);
+	}
+
+	if (threadPoolSize == 0)
+		threadPoolSize = std::thread::hardware_concurrency();
 
 	EventLoop loop;
 	InetAddress addr(9877);
