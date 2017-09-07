@@ -197,6 +197,10 @@ int main(int argc, char** argv)
 	if (threadPoolSize == 0)
 		threadPoolSize = std::thread::hardware_concurrency();
 
+#ifndef NDEBUG
+	INFO("debug mode");
+#endif
+
 	EventLoop loop;
 	InetAddress addr(9877);
 	NQueenServer server(&loop, addr, threadPoolSize);
