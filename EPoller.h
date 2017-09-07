@@ -17,6 +17,7 @@ class EPoller: noncopyable
 public:
 	typedef std::vector<Channel*> ChannelList;
 
+	explicit
 	EPoller(EventLoop* loop);
 	~EPoller();
 

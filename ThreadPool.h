@@ -23,6 +23,8 @@ public:
 
 	void runTask(const Task& task);
 	void stop();
+	size_t numThreads() const
+	{ return threads_.size(); }
 
 private:
 	void runInThread(size_t index);

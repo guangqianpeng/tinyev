@@ -8,14 +8,15 @@
 #include "TcpClient.h"
 
 #include <sstream>
+#include <unordered_map>
 #include <string>
 
 class NQueenClient: noncopyable
 {
 public:
-	typedef std::vector<TcpConnectionPtr> TcpConnectionList;
-	typedef std::function<void(const TcpConnectionList&)> AllConnectedCallback;
-	typedef std::function<void(const TcpConnectionPtr&, int64_t)> ResponseCallback;
+	typedef std::unordered_map<TcpConnectionPtr, uint> TcpConnectionMap;
+	typedef std::function<void(const TcpConnectionMap&)> AllConnectedCallback;
+	typedef std::function<void(const TcpConnectionPtr&, int64_t, const std::vector<uint>&)> ResponseCallback;
 
 	NQueenClient(EventLoop* loop, const std::vector<InetAddress>& peers)
 			: loop_(loop)
@@ -45,9 +46,7 @@ public:
 	{ responseCallback_ = cb; }
 
 	void onError()
-	{
-		forceCloseAllQuit();
-	}
+	{ forceCloseAllQuit(); }
 
 private:
 	void onConnection(const TcpConnectionPtr& conn)
@@ -56,19 +55,8 @@ private:
 			 conn->name().c_str(),
 			 conn->connected() ? "up":"down");
 
-		if (conn->connected()) {
-			connections_.push_back(conn);
-			if (connections_.size() == clients_.size()) {
-				if (allConnectedCallback_)
-					allConnectedCallback_(connections_);
-				else {
-					INFO("all connected, now quit");
-					onError();
-				}
-			}
-		}
-		else {
-			ERROR("connection %s closed by peer", conn->name().c_str());
+		if (conn->disconnected()) {
+			WARN("connection %s closed", conn->name().c_str());
 			onError();
 		}
 	}
@@ -80,21 +68,46 @@ private:
 			  buffer.readableBytes());
 
 		while (true) {
-			const char* crlf = buffer.findCRLF();
+			const char *crlf = buffer.findCRLF();
 			if (crlf == nullptr)
 				break;
 
-			std::stringstream in(std::string(buffer.peek(), crlf));
+			const char *peek = buffer.peek();
+			char cmd = *peek;
+
+			std::stringstream in(std::string(peek + 1, crlf));
 			buffer.retrieveUntil(crlf + 2);
 
-			int64_t response;
-			if (in >> response && response >= 0) {
-				if (responseCallback_)
-					responseCallback_(conn, response);
+			if (cmd == '$') {
+				assert(connections_.find(conn) == connections_.end());
+				uint cores;
+				if (in >> cores)
+					connections_[conn] = cores;
+				else {
+					ERROR("bad cores");
+					onError();
+					break;
+				}
+
+				if (connections_.size() == clients_.size()) {
+					allConnectedCallback_(connections_);
+				}
 			}
-			else {
-				ERROR("bad response");
-				onError();
+			else if (cmd == '#') {
+
+				int64_t count;
+				if (in >> count && count >= 0) {
+					std::vector<uint> queens;
+					uint col;
+					while (in >> col)
+						queens.push_back(col);
+					if (responseCallback_)
+						responseCallback_(conn, count, queens);
+				} else {
+					ERROR("bad response");
+					onError();
+					break;
+				}
 			}
 		}
 	}
@@ -102,7 +115,7 @@ private:
 	void forceCloseAllQuit()
 	{
 		for (auto& conn: connections_)
-			conn->forceClose();
+			conn.first->forceClose();
 		loop_->queueInLoop(std::bind(&EventLoop::quit, loop_));
 	}
 
@@ -112,7 +125,7 @@ private:
 
 	EventLoop* loop_;
 	TcpClientList clients_;
-	TcpConnectionList connections_;
+	TcpConnectionMap connections_;
 	AllConnectedCallback allConnectedCallback_;
 	ResponseCallback responseCallback_;
 };
@@ -122,7 +135,7 @@ const static int64_t answerSheet[] = {0, 1, 0, 0, 2, 10, 4, 40, 92, 352, 724, 26
 class NQueenSolver: noncopyable
 {
 public:
-	typedef NQueenClient::TcpConnectionList TcpConnectionList;
+	typedef NQueenClient::TcpConnectionMap TcpConnectionMap;
 
 	NQueenSolver(EventLoop* loop, const std::vector<InetAddress>& peers, int nQueen)
 			: loop_(loop),
@@ -134,53 +147,54 @@ public:
 	{
 		assert(nQueen > 0);
 		client_.setAllConnectedCallback(std::bind(
-				&NQueenSolver::sendRequest, this, _1));
+				&NQueenSolver::sendRequests, this, _1));
 		client_.setResponseCallback(std::bind(
-				&NQueenSolver::onResponse, this, _1, _2));
+				&NQueenSolver::onResponse, this, _1, _2, _3));
+		initRequests();
 	}
 
 	void start() { client_.start(); }
 
 private:
-	void sendRequest(const TcpConnectionList& conns)
+	void sendRequests(const TcpConnectionMap &conns)
 	{
 		assert(!conns.empty());
-		if (nQueen_ <= 8) {
-			// no concurrency
-			totalRequest = 1;
-			conns[0]->send(std::to_string(nQueen_) + "\r\n");
-		}
-		else if (nQueen_ <= 15) {
-			// level 1 concurrency
-			totalRequest = nQueen_;
-			for (int i = 0; i < nQueen_; ++i) {
-				size_t index = i % conns.size();
-				auto& conn = conns[index];
-				conn->send(std::to_string(nQueen_) + ' ' +
-								   std::to_string(i) + "\r\n");
-			}
-		}
-		else {
-			// level 2 concurrency
-			totalRequest = nQueen_ * nQueen_;
-			for (int i = 0; i < nQueen_; ++i) {
-				for (int j = 0; j < nQueen_; ++j) {
-					size_t index = (i * nQueen_ + j) % conns.size();
-					auto& conn = conns[index];
-					conn->send(std::to_string(nQueen_) + ' ' +
-									   std::to_string(i) + ' ' +
-									   std::to_string(j) + "\r\n");
+		assert(totalRequest > 0);
+		assert(totalResponse == 0);
+
+		for (auto& p: conns) {
+			auto& conn = p.first;
+			uint cores = p.second;
+			assert(cores > 0);
+
+			for (uint i = 0; i < cores; ++i) {
+				if (!requests_.empty()) {
+					sendOneRequest(conn);
 				}
+				else break;
 			}
+			if (requests_.empty())
+				break;
 		}
 
 		INFO("waiting...");
 	}
 
-	void onResponse(const TcpConnectionPtr&, int64_t count)
+	void onResponse(const TcpConnectionPtr& conn, int64_t count, const std::vector<uint>& queens)
 	{
 		assert(count >= 0);
-		answer += count;
+
+		if (!queens.empty()) {
+			// middle col
+			if (queens.size() % 2 == 1 &&
+				queens[0] + 1 == (static_cast<uint>(nQueen_) + 1) / 2)
+				answer += count;
+			else
+				answer += 2 * count;
+		}
+		else
+			answer += count;
+
 		totalResponse++;
 		if (totalResponse == totalRequest) {
 			INFO("answer of %d queen: %ld, %s",
@@ -188,12 +202,55 @@ private:
 				 answer == answerSheet[nQueen_] ? "right":"wrong");
 			client_.onError();
 		}
+		if (totalResponse % 10 == 0) {
+			INFO("[%d/%d] sub problems solved, %ld answers found",
+				 totalResponse, totalRequest, answer);
+		}
+
+		if (!requests_.empty())
+			sendOneRequest(conn);
+	}
+
+	void initRequests()
+	{
+		if (nQueen_ <= 8) {
+			// no concurrency
+			requests_.push_back(std::to_string(nQueen_) + "\r\n");
+			totalRequest++;
+		}
+		else if (nQueen_ <= 15) {
+			// level 1 concurrency
+			for (int i = 0; i < (nQueen_ + 1) / 2; ++i) {
+				requests_.push_back(std::to_string(nQueen_) + ' ' +
+											std::to_string(i) + "\r\n");
+				totalRequest++;
+			}
+		}
+		else {
+			// level 2 concurrency
+			for (int i = 0; i < (nQueen_ + 1) / 2; ++i) {
+				for (int j = 0; j < nQueen_; ++j) {
+					requests_.push_back(std::to_string(nQueen_) + ' ' +
+							   std::to_string(i) + ' ' +
+							   std::to_string(j) + "\r\n");
+					totalRequest++;
+				}
+			}
+		}
+	}
+
+	void sendOneRequest(const TcpConnectionPtr& conn)
+	{
+		assert(!requests_.empty());
+		conn->send(requests_.back());
+		requests_.pop_back();
 	}
 
 private:
 	EventLoop* loop_;
 	const int nQueen_;
 	NQueenClient client_;
+	std::vector<std::string> requests_;
 
 	int64_t answer;
 	int totalRequest;

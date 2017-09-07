@@ -14,8 +14,6 @@
 #include "EPoller.h"
 #include "noncopyable.h"
 
-class Channel;
-
 class EventLoop: noncopyable
 {
 public:

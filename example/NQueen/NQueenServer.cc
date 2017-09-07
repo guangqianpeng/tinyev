@@ -119,6 +119,8 @@ private:
 		INFO("connection %s is [%s]",
 			 conn->name().c_str(),
 			 conn->connected() ? "up":"down");
+		if (conn->connected())
+			conn->send("$ " + std::to_string(threadPool_.numThreads()) + "\r\n");
 	}
 
 	void onMessage(const TcpConnectionPtr& conn, Buffer& buffer)
@@ -164,10 +166,14 @@ private:
 
 			threadPool_.runTask([nQueens, queens, conn](){
 				int64_t count = BackTrack::solve(nQueens, queens);
-				conn->send(std::to_string(count) + "\r\n");
+				std::string response("# " + std::to_string(count));
+				for (uint col: queens) {
+					response.push_back(' ');
+					response.append(std::to_string(col));
+				}
+				conn->send(response.append("\r\n"));
 			});
 		}
-
 #undef Error
 	}
 
