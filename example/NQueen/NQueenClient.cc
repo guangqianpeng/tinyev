@@ -89,6 +89,9 @@ private:
 					break;
 				}
 
+				INFO("server %s has %u cores",
+					 conn->peer().toIpPort().c_str(), cores);
+
 				if (connections_.size() == clients_.size()) {
 					allConnectedCallback_(connections_);
 				}

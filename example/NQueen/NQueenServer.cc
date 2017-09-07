@@ -101,9 +101,9 @@ private:
 class NQueenServer
 {
 public:
-	NQueenServer(EventLoop* loop, const InetAddress& addr)
+	NQueenServer(EventLoop* loop, const InetAddress& addr, size_t threadPoolSize)
 			  : server(loop, addr),
-				threadPool_(4)
+				threadPool_(threadPoolSize)
 	{
 		server.setConnectionCallback(std::bind(
 				&NQueenServer::onConnection, this, _1));
@@ -182,12 +182,15 @@ private:
 	ThreadPool threadPool_;
 };
 
-int main()
+int main(int , char** )
 {
 	setLogLevel(LOG_LEVEL_TRACE);
+
+	size_t threadPoolSize = std::thread::hardware_concurrency();
+
 	EventLoop loop;
 	InetAddress addr(9877);
-	NQueenServer server(&loop, addr);
+	NQueenServer server(&loop, addr, threadPoolSize);
 	server.start();
 	loop.loop();
 }
