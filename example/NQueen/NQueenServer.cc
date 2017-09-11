@@ -4,23 +4,22 @@
 
 #include <cstdint>
 #include <cassert>
-#include <atomic>
-#include <sstream>
 
 #include "Logger.h"
 #include "EventLoop.h"
 #include "TcpConnection.h"
 #include "TcpServer.h"
 #include "ThreadPool.h"
+#include "Codec.h"
 
 class BackTrack
 {
 public:
-	static int64_t solve(uint nQueen, const std::vector<uint>& queens)
+	static int64_t solve(uint32_t nQueen, const std::vector<uint32_t>& queens)
 	{
 		BackTrack b(nQueen);
 		if (b.tryPutQueens(queens)) {
-			uint startRow = static_cast<uint>(queens.size());
+			auto startRow = static_cast<uint32_t>(queens.size());
 			b.search(startRow);
 		}
 		return b.count;
@@ -29,7 +28,7 @@ public:
 	const static uint kMaxQueens = 32;
 
 private:
-	const uint N;
+	const uint32_t N;
 	int64_t count;
 	// bitmask, 0 is available
 	uint32_t col[kMaxQueens];
@@ -47,13 +46,15 @@ private:
 		assert(nQueens <= kMaxQueens && nQueens > 0);
 	}
 
-	bool tryPutQueens(const std::vector<uint> &queens)
+	bool tryPutQueens(const std::vector<uint32_t> &queens)
 	{
-		assert(queens.size() <= N);
+		if (queens.size() > N)
+			return false;
 
 		for (size_t row = 0; row < queens.size(); ++row) {
 
-			assert(queens[row] < N);
+			if (queens[row] >= N)
+				return false;
 
 			// bitmask, 0 is available
 			uint32_t unavail = col[row] | diag[row] | antidiag[row];
@@ -102,16 +103,18 @@ class NQueenServer
 {
 public:
 	NQueenServer(EventLoop* loop, const InetAddress& addr, size_t threadPoolSize)
-			  : server(loop, addr),
+			  : loop_(loop),
+				codec_(std::bind(&NQueenServer::onRequest, this, _1, _2)),
+				server_(loop, addr),
 				threadPool_(threadPoolSize)
 	{
-		server.setConnectionCallback(std::bind(
+		server_.setConnectionCallback(std::bind(
 				&NQueenServer::onConnection, this, _1));
-		server.setMessageCallback(std::bind(
-				&NQueenServer::onMessage, this, _1, _2));
+		server_.setMessageCallback(std::bind(
+				&Codec::parseMessage, &codec_, _1, _2));
 	}
 
-	void start() { server.start(); }
+	void start() { server_.start(); }
 
 private:
 	void onConnection(const TcpConnectionPtr& conn)
@@ -119,66 +122,29 @@ private:
 		INFO("connection %s is [%s]",
 			 conn->name().c_str(),
 			 conn->connected() ? "up":"down");
-		if (conn->connected())
-			conn->send("$ " + std::to_string(threadPool_.numThreads()) + "\r\n");
+		if (conn->connected()) {
+			auto nCores = static_cast<uint32_t>(threadPool_.numThreads());
+			codec_.send(conn, nCores);
+		}
 	}
 
-	void onMessage(const TcpConnectionPtr& conn, Buffer& buffer)
+	void onRequest(const TcpConnectionPtr& conn, const Request& rqst)
 	{
-		TRACE("connection %s recv %lu bytes",
-			  conn->name().c_str(),
-			  buffer.readableBytes());
+		TRACE("connection %s recv one request",
+			  conn->name().c_str());
 
-#define Error(str) do { conn->send(str"\r\n"); return; } while(false)
-
-		while (true) {
-			const char *crlf = buffer.findCRLF();
-			if (crlf == nullptr)
-				break;
-			const char *peek = buffer.peek();
-
-			std::stringstream in(std::string(peek, crlf));
-
-			buffer.retrieveUntil(crlf + 2);
-
-			uint nQueens;
-			if (!(in >> nQueens))
-				Error("invalid queen number");
-
-			if (nQueens == 0 || nQueens > BackTrack::kMaxQueens)
-				Error("invalid queen number");
-
-			std::vector<uint> queens;
-			uint q;
-			while (in >> q) {
-				if (q >= nQueens)
-					Error("invalid queen position");
-				queens.push_back(q);
-			}
-
-			in.clear();
-			std::string remain;
-			if (in >> remain)
-				Error("bad request");
-
-			if (queens.size() > nQueens)
-				Error("too many queens");
-
-			threadPool_.runTask([nQueens, queens, conn](){
-				int64_t count = BackTrack::solve(nQueens, queens);
-				std::string response("# " + std::to_string(count));
-				for (uint col: queens) {
-					response.push_back(' ');
-					response.append(std::to_string(col));
-				}
-				conn->send(response.append("\r\n"));
-			});
-		}
-#undef Error
+		threadPool_.runTask([this, rqst, conn](){
+			Response rsps;
+			rsps.count = BackTrack::solve(rqst.nQueen, rqst.cols);
+			rsps.cols = rqst.cols;
+			codec_.send(conn, rsps);
+		});
 	}
 
 private:
-	TcpServer server;
+	EventLoop* loop_;
+	Codec codec_;
+	TcpServer server_;
 	ThreadPool threadPool_;
 };
 
