@@ -2,6 +2,8 @@
 // Created by frank on 17-9-1.
 //
 
+// from muduo:Buffer
+
 #ifndef TINYEV_BUFFER_H
 #define TINYEV_BUFFER_H
 
@@ -119,17 +121,17 @@ public:
 		return result;
 	}
 
-	void append(const std::string& data)
+	void append(const std::string &data)
 	{ append(data.c_str(), data.length()); }
 
-	void append(const char* data, size_t len)
+	void append(const char *data, size_t len)
 	{
 		ensureWritableBytes(len);
 		std::copy(data, data + len, beginWrite());
 		hasWritten(len);
 	}
 
-	void append(const void* data, size_t len)
+	void append(const void *data, size_t len)
 	{ append(static_cast<const char *>(data), len); }
 
 	void ensureWritableBytes(size_t len)
@@ -253,11 +255,11 @@ public:
 	void prependInt8(int8_t x)
 	{ prepend(&x, sizeof x); }
 
-	void prepend(const void* data, size_t len)
+	void prepend(const void *data, size_t len)
 	{
 		assert(len <= prependableBytes());
 		readerIndex_ -= len;
-		auto d = static_cast<const char*>(data);
+		auto d = static_cast<const char *>(data);
 		std::copy(d, d + len, begin() + readerIndex_);
 	}
 
