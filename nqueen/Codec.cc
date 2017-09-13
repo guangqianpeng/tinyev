@@ -101,6 +101,9 @@ void Codec::parseMessage(const TcpConnectionPtr& conn, Buffer& buffer)
 		std::string str(peek, crlf);
 		buffer.retrieveUntil(crlf + 2);
 
+		if (str.empty())
+			continue;
+
 		switch (str[0]) {
 			case '$':
 			{

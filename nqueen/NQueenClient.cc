@@ -25,7 +25,7 @@ public:
 	NQueenClient(EventLoop* loop, const std::vector<InetAddress>& peers, uint32_t nQueen)
 			: loop_(loop),
 			  nQueen_(nQueen),
-			  codec_(std::bind(&NQueenClient::onResponse, this, _1, _2),
+			  codec_(std::bind(&NQueenClient::onMessage, this, _1, _2),
 					 std::bind(&NQueenClient::onTellCores, this, _1, _2)),
 			  totalRequests_(0),
 			  totalResponse_(0),
@@ -38,7 +38,7 @@ public:
 			client->setMessageCallback(std::bind(
 					&Codec::parseMessage, &codec_, _1, _2));
 			client->setErrorCallback(std::bind(
-					&NQueenClient::onError, this));
+					&NQueenClient::onConnectError, this));
 			clients_.emplace_back(client);
 		}
 		initRequests();
@@ -60,11 +60,23 @@ private:
 			connections_.insert(conn);
 		else {
 			connections_.erase(conn);
-			onError();
+			onConnectError();
 		}
 	}
 
-	void onResponse(const TcpConnectionPtr& conn, const Response& rsps)
+	void onConnectError()
+	{
+		if (connections_.empty()) {
+			INFO("all connections closed, now quit");
+			loop_->quit();
+		}
+		else {
+			auto it = connections_.begin();
+			(*it)->shutdown();
+		}
+	}
+
+	void onMessage(const TcpConnectionPtr &conn, const Response &rsps)
 	{
 		assert(rsps.count >= 0);
 
@@ -102,18 +114,6 @@ private:
 				sendOneRequest(conn);
 			}
 			else break;
-		}
-	}
-
-	void onError()
-	{
-		if (connections_.empty()) {
-			INFO("all connections closed, now quit");
-			loop_->quit();
-		}
-		else {
-			auto it = connections_.begin();
-			(*it)->shutdown();
 		}
 	}
 

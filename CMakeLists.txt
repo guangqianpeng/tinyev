@@ -22,7 +22,9 @@ set(SOURCE_FILES
 		Buffer.h Buffer.cc
 		ThreadPool.cc ThreadPool.h
 		Connector.cc Connector.h TcpClient.cc TcpClient.h)
-add_subdirectory(example)
+add_subdirectory(integers)
+add_subdirectory(nqueen)
+add_subdirectory(trivial)
 add_compile_options(-Wall -Wextra -Werror)
 add_library(tinyev STATIC ${SOURCE_FILES})
 target_link_libraries(tinyev pthread)

@@ -1,4 +1,4 @@
-include_directories(../../)
+include_directories(../)
 add_compile_options(-Wall -Wextra -Werror)
 add_executable(n_queen_server NQueenServer.cc Codec.cc Codec.h)
 target_link_libraries(n_queen_server tinyev)
