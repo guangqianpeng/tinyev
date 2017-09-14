@@ -8,10 +8,9 @@
 #include "TcpConnection.h"
 #include "Codec.h"
 
-#define COMMAND_SUM 	'!'
-#define COMMAND_LESS 	'@'
-#define ANSWER_SUM		'#'
-#define ANSWER_LESS		'$'
+#define QUERY 	'@'
+#define STATE	'#'
+#define ANSWER	'$'
 
 namespace
 {
@@ -87,19 +86,16 @@ void Codec::parseMessage(const TcpConnectionPtr &conn, Buffer &buffer)
 			continue;
 
 		switch (str[0]) {
-			case COMMAND_SUM:
-				cmdSumCallback_(conn);
-				break;
-			case COMMAND_LESS:
-				if (!parseCommandLess(conn, str.substr(1)))
+			case QUERY:
+				if (!parseQuery(conn, str.substr(1)))
 					return;
 				break;
-			case ANSWER_SUM:
-				if (!parseAnswerSum(conn, str.substr(1)))
+			case STATE:
+				if (!parseState(conn, str.substr(1)))
 					return;
 				break;
-			case ANSWER_LESS:
-				if (!parseAnswerLess(conn, str.substr(1)))
+			case ANSWER:
+				if (!parseAnswer(conn, str.substr(1)))
 					return;
 				break;
 			default:
@@ -109,53 +105,54 @@ void Codec::parseMessage(const TcpConnectionPtr &conn, Buffer &buffer)
 	}
 }
 
-void Codec::sendCommandSum(const TcpConnectionPtr &conn)
+void Codec::sendQuery(const TcpConnectionPtr &conn, int64_t guess)
 {
-	std::string str(1, COMMAND_SUM);
+	std::string str(1, QUERY);
+	str.append(std::to_string(guess));
 	conn->send(str.append("\r\n"));
 }
 
-void Codec::sendCommandLess(const TcpConnectionPtr &conn, int64_t target)
+void Codec::sendState(const TcpConnectionPtr &conn,
+					  __int128 sum, int64_t count, int64_t min, int64_t max)
 {
-	std::string str(1, COMMAND_LESS);
-	str.append(std::to_string(target));
-	conn->send(str.append("\r\n"));
-}
-
-void Codec::sendAnswerSum(const TcpConnectionPtr &conn, __int128 sum, int64_t count)
-{
-	std::string str(1, ANSWER_SUM);
+	std::string str(1, STATE);
 	str.append(toString(sum));
 	str.push_back(' ');
 	str.append(std::to_string(count));
+	str.push_back(' ');
+	str.append(std::to_string(min));
+	str.push_back(' ');
+	str.append(std::to_string(max));
 	conn->send(str.append("\r\n"));
 }
 
-void Codec::sendAnswerLess(const TcpConnectionPtr &conn, int64_t lessCount, int64_t equalCount)
+void Codec::sendAnswer(const TcpConnectionPtr &conn,
+					   int64_t lessCount, int64_t equalCount)
 {
-	std::string str(1, ANSWER_LESS);
+	std::string str(1, ANSWER);
 	str.append(std::to_string(lessCount));
 	str.push_back(' ');
 	str.append(std::to_string(equalCount));
 	conn->send(str.append("\r\n"));
 }
 
-bool Codec::parseCommandLess(const TcpConnectionPtr& conn, const std::string& arg)
+bool Codec::parseQuery(const TcpConnectionPtr &conn, const std::string &arg)
 {
 	std::istringstream in(arg);
 	int64_t target;
-	if (in >> target && cmdLessCallback_) {
-		cmdLessCallback_(conn, target);
+	if (in >> target && queryCallback_) {
+		queryCallback_(conn, target);
 		return true;
 	}
 	parseErrorCallback_(conn);
 	return false;
 }
 
-bool Codec::parseAnswerSum(const TcpConnectionPtr& conn, const std::string& arg)
+bool Codec::parseState(const TcpConnectionPtr &conn, const std::string &arg)
 {
 	__int128 sum;
 	int64_t count;
+	int64_t min, max;
 
 	size_t len = parseInt128(arg, sum);
 	if (len == 0) {
@@ -164,22 +161,24 @@ bool Codec::parseAnswerSum(const TcpConnectionPtr& conn, const std::string& arg)
 	}
 
 	std::istringstream in(arg.substr(len));
-	if (in >> count && ansSumCallback_) {
-		ansSumCallback_(conn, sum, count);
+	if (in >> count >> min >> max) {
+		tellStateCallback_(conn, sum, count, min, max);
 		return true;
 	}
 	parseErrorCallback_(conn);
 	return false;
 }
 
-bool Codec::parseAnswerLess(const TcpConnectionPtr& conn, const std::string& arg)
+bool Codec::parseAnswer(const TcpConnectionPtr &conn, const std::string &arg)
 {
 	std::istringstream in(arg);
 	int64_t lessCount;
 	int64_t equalCount;
-	if (in >> lessCount >> equalCount && ansLessCallback_) {
-		ansLessCallback_(conn, lessCount, equalCount);
-		return true;
+	if (in >> lessCount >> equalCount) {
+		if (answerCallback_) {
+			answerCallback_(conn, lessCount, equalCount);
+			return true;
+		}
 	}
 	parseErrorCallback_(conn);
 	return false;

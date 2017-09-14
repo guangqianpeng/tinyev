@@ -1,6 +1,0 @@
-include_directories(../)
-add_compile_options(-Wall -Wextra -Werror)
-add_executable(integer_server IntegerServer.cc Codec.cc Codec.h)
-target_link_libraries(integer_server tinyev)
-add_executable(average_client AverageClient.cc Codec.cc Codec.h)
-target_link_libraries(average_client tinyev)
