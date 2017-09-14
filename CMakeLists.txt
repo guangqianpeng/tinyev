@@ -22,7 +22,7 @@ set(SOURCE_FILES
 		Buffer.h Buffer.cc
 		ThreadPool.cc ThreadPool.h
 		Connector.cc Connector.h TcpClient.cc TcpClient.h)
-add_subdirectory(kth)
+add_subdirectory(kth_element)
 add_subdirectory(nqueen)
 add_subdirectory(trivial)
 add_compile_options(-Wall -Wextra -Werror)
