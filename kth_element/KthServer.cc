@@ -66,6 +66,8 @@ private:
 
 		assert(max >= min);
 
+		numbers_.reserve(static_cast<size_t>(count));
+
 		int64_t range = max - min;
 		for (int64_t i = 0; i < count; ++i) {
 			int64_t value = min;
@@ -103,7 +105,7 @@ private:
 
 void usage()
 {
-	printf("usage: ./KthServer #count");
+	printf("usage: ./KthServer #count\n");
 	exit(EXIT_FAILURE);
 }
 

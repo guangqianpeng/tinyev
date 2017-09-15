@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 
 	EventLoop loop;
 	std::vector<InetAddress> peers = parseArgs(argc, argv);
-	KthClient client(&loop, peers, -1);
+	KthClient client(&loop, peers, 1);
 	client.start();
 	loop.loop();
 }
