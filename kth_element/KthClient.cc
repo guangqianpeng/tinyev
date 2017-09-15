@@ -98,11 +98,11 @@ private:
 			INFO("average: %ld", static_cast<int64_t>(sum_ / totalCount_));
 
 			if (kth_ <= 0)
-				kth_ = totalCount_ / 2;
+				kth_ = (totalCount_ + 1) / 2;
 			else if (kth_ > totalCount_)
 				kth_ = totalCount_;
 
-			INFO("start finding %ldth element...", kth_);
+			INFO("***start finding %ldth element...", kth_);
 
 			for (auto& c: connections_)
 				sendOneQuery(c);
@@ -133,11 +133,11 @@ private:
 			assert(nIteration_ <= 64);
 			assert(low_ <= high_);
 
-			INFO("iteration %ld, less %ld, euqal %ld",
-				 nIteration_, nLess_, nEqual_);
+			INFO("iteration %ld, guess %ld, less %ld, euqal %ld",
+				 nIteration_, guess_, nLess_, nEqual_);
 
 			if (done) {
-				INFO("find %ldth element: %ld", kth_, guess_);
+				INFO("***find %ldth element: %ld", kth_, guess_);
 				conn->shutdown();
 			}
 			else {
@@ -155,7 +155,6 @@ private:
 
 	void sendOneQuery(const TcpConnectionPtr &conn)
 	{
-		INFO("guess %ld, low %ld, high %ld...", guess_, low_, high_);
 		codec_.sendQuery(conn, guess_);
 	}
 
@@ -211,7 +210,7 @@ int main(int argc, char** argv)
 
 	EventLoop loop;
 	std::vector<InetAddress> peers = parseArgs(argc, argv);
-	KthClient client(&loop, peers, 1);
+	KthClient client(&loop, peers, -1);
 	client.start();
 	loop.loop();
 }

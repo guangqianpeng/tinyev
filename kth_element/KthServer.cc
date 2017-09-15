@@ -3,6 +3,8 @@
 //
 
 #include <climits>
+#include <unistd.h> //getpid
+#include <algorithm> // sort
 
 #include "Logger.h"
 #include "EventLoop.h"
@@ -10,67 +12,15 @@
 #include "Codec.h"
 #include "TcpConnection.h"
 
-FILE* textToBinary(const std::string& fileName)
-{
-	FILE* textFile = fopen(fileName.c_str(), "r");
-	if (textFile == nullptr)
-		return nullptr;
-
-	FILE* binFile = tmpfile();
-
-	INFO("transfer text to binary...");
-
-	bool empty = true;
-	char buf[21];
-	while (fscanf(textFile, "%20s", buf) == 1) {
-		char* end = nullptr;
-		int64_t elem = strtol(buf, &end, 10);
-
-		if (end == buf || *end != '\0')
-			break;
-		if (errno == ERANGE && (elem == LONG_MIN || elem == LONG_MAX))
-			break;
-
-		size_t n = fwrite(&elem, sizeof(elem), 1, binFile);
-		if (n != 1)
-			break;
-
-		empty = false;
-	}
-
-	if (empty || feof(textFile) == 0) {
-		fclose(binFile);
-		return nullptr;
-	}
-
-	fclose(textFile);
-
-	INFO("transfer done");
-
-	return binFile;
-}
 
 class KthServer: noncopyable
 {
 public:
-	KthServer(EventLoop* loop, const InetAddress& addr, const std::string& fileName)
+	KthServer(EventLoop* loop, const InetAddress& addr, int64_t count)
 			: loop_(loop),
-			  server_(loop, addr),
-			  file_(textToBinary(fileName)),
-			  sum_(0),
-			  count_(0),
-			  min_(INT64_MAX),
-			  max_(INT64_MIN)
+			  server_(loop, addr)
 	{
-		if (file_ == nullptr)
-			SYSFATAL("textToBinary()");
-
-		foreach([this](int64_t elem) {
-			if (min_ > elem) min_ = elem;
-			if (max_ < elem) max_ = elem;
-			sum_ += elem;
-			count_++;
-		});
+		generate(count, 0, INT32_MAX);
 
 		INFO("count: %ld, min: %ld, max: %ld", count_, min_, max_);
 
@@ -81,8 +31,6 @@ public:
 		server_.setMessageCallback(std::bind(
 				&Codec::parseMessage, &codec_, _1, _2));
 	}
-
-	~KthServer() { fclose(file_); }
 
 	void start() { server_.start(); }
 
@@ -98,62 +46,82 @@ private:
 
 	void lessEqualCount(const TcpConnectionPtr& conn, int64_t guess)
 	{
-		int64_t lessCount = 0;
-		int64_t equalCount = 0;
+		auto lower = std::lower_bound(numbers_.begin(), numbers_.end(), guess);
+		auto upper = std::upper_bound(numbers_.begin(), numbers_.end(), guess);
 
-		INFO("guess %ld...", guess);
-
-		foreach([&lessCount, &equalCount, guess](int64_t elem) {
-					if (elem < guess)
-						lessCount++;
-					else if (elem == guess)
-						equalCount++;
-				});
+		int64_t lessCount = lower - numbers_.begin();
+		int64_t equalCount = upper - lower;
 
 		INFO("guess %ld, less %ld, equal %ld",
 			 guess, lessCount, equalCount);
 		codec_.sendAnswer(conn, lessCount, equalCount);
 	}
 
-	template <typename Func>
-	void foreach(Func&& func) // universal reference
+	void generate(int64_t count, int64_t min, int64_t max)
 	{
-		rewind(file_);
+		unsigned short xsubi[3];
+		xsubi[0] = static_cast<unsigned short>(getpid());
+		xsubi[1] = static_cast<unsigned short>(time(nullptr));
+		xsubi[2] = 0;
 
-		const int bufSize = 8192;
-		int64_t buf[bufSize]; // 8192*8=64KB
-		while (true) {
-			size_t n = fread(buf, sizeof(int64_t), bufSize, file_);
-			for (size_t i = 0; i < n ; ++i)
-				func(buf[i]);
-			if (n < bufSize)
-				break;
+		assert(max >= min);
+
+		int64_t range = max - min;
+		for (int64_t i = 0; i < count; ++i) {
+			int64_t value = min;
+			if (range > 0) {
+				value += nrand48(xsubi) % range;
+			}
+			numbers_.push_back(value);
 		}
 
-		assert(feof(file_) != 0);
+		std::sort(numbers_.begin(), numbers_.end());
+
+		sum_ = 0;
+		for (int64_t i: numbers_)
+			sum_ += i;
+		count_ = count;
+		min_ = numbers_.front();
+		max_ = numbers_.back();
+
+#ifndef NDEBUG
+		for (int64_t i: numbers_)
+			printf("%ld ", i);
+		printf("\n");
+#endif
+
 	}
 
 	EventLoop* loop_;
 	Codec codec_;
 	TcpServer server_;
-	FILE* file_;
 	__int128 sum_;
 	int64_t count_;
 	int64_t min_, max_;
+	std::vector<int64_t> numbers_;
 };
+
+void usage()
+{
+	printf("usage: ./KthServer #count");
+	exit(EXIT_FAILURE);
+}
 
 int main(int argc, char** argv)
 {
-	if (argc != 2) {
-		printf("usage: %s filename", argv[0]);
-		exit(EXIT_FAILURE);
-	}
+	if (argc < 2)
+		usage();
 
 	setLogLevel(LOG_LEVEL_TRACE);
 
+	char* end = nullptr;
+	int64_t count = strtol(argv[1], &end, 10);
+	if (*end != '\0')
+		usage();
+
 	EventLoop loop;
 	InetAddress addr(9877);
-	KthServer server(&loop, addr, argv[1]);
+	KthServer server(&loop, addr, count);
 	server.start();
 	loop.loop();
 }
