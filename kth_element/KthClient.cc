@@ -105,7 +105,7 @@ private:
 			INFO("***start finding %ldth element...", kth_);
 
 			for (auto& c: connections_)
-				sendOneQuery(c);
+				codec_.sendQuery(c, guess_);
 		}
 	}
 
@@ -145,19 +145,14 @@ private:
 				nEqual_ = 0;
 				nAnsewered_ = 0;
 				guess_ = low_ + (high_ - low_) / 2;
-				sendOneQuery();
+				for (auto& c: connections_)
+					codec_.sendQuery(c, guess_);
 			}
 		}
 	}
 
 	bool allToldState() { return nServerState_ == clients_.size(); }
 	bool allAnswered() { return nAnsewered_ == clients_.size(); }
-
-	void sendOneQuery()
-	{
-		for (auto& c: connections_)
-			codec_.sendQuery(c, guess_);
-	}
 
 	typedef std::unique_ptr<TcpClient> TcpClientPtr;
 	typedef std::vector<TcpClientPtr> TcpClientList;
