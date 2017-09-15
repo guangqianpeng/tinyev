@@ -145,7 +145,7 @@ private:
 				nEqual_ = 0;
 				nAnsewered_ = 0;
 				guess_ = low_ + (high_ - low_) / 2;
-				sendOneQuery(conn);
+				sendOneQuery();
 			}
 		}
 	}
@@ -153,7 +153,7 @@ private:
 	bool allToldState() { return nServerState_ == clients_.size(); }
 	bool allAnswered() { return nAnsewered_ == clients_.size(); }
 
-	void sendOneQuery(const TcpConnectionPtr &conn)
+	void sendOneQuery()
 	{
 		for (auto& c: connections_)
 			codec_.sendQuery(c, guess_);
