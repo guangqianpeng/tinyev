@@ -48,5 +48,6 @@ private:
 	ParseErrorCallback parseErrorCallback_;
 };
 
+std::string toString(__int128 x);
 
 #endif //TINYEV_CODEC_H

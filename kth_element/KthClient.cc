@@ -93,9 +93,12 @@ private:
 			high_ = max_;
 			guess_ = low_ + static_cast<uint64_t>(high_ - low_) / 2;
 
-			INFO("global sum: %ld, count: %ld, min: %ld, max: %ld",
-				 static_cast<int64_t>(sum_), totalCount_, min_, max_);
-			INFO("average: %ld", static_cast<int64_t>(sum_ / totalCount_));
+			INFO("global sum: %ld, count: %ld,"
+						 " average: %s, min: %ld, max: %ld",
+				 static_cast<int64_t>(sum_),
+				 totalCount_,
+				 toString(sum_ / totalCount_).c_str(),
+				 min_, max_);
 
 			if (kth_ <= 0)
 				kth_ = (totalCount_ + 1) / 2;

@@ -15,28 +15,6 @@
 namespace
 {
 
-std::string toString(__int128 x)
-{
-	static const char digits[19] =
-			{ '9', '8', '7', '6', '5', '4', '3', '2', '1', '0',
-			  '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-	static const char* zero = &digits[9];
-
-	std::string str;
-	do {
-		// lsd - least significant digit
-		auto lsd = static_cast<int>(x % 10);
-		x /= 10;
-		str.push_back(zero[lsd]);
-	} while (x != 0);
-
-	if (x < 0)
-		str.push_back('-');
-
-	std::reverse(str.begin(), str.end());
-	return str;
-}
-
 size_t parseInt128(const std::string& arg, __int128& ret)
 {
 	if (arg.empty())
@@ -66,6 +44,28 @@ void defaultParseErrorCallback(const TcpConnectionPtr& conn)
 	conn->forceClose();
 }
 
+}
+
+std::string toString(__int128 x)
+{
+	static const char digits[19] =
+			{ '9', '8', '7', '6', '5', '4', '3', '2', '1', '0',
+			  '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+	static const char* zero = &digits[9];
+
+	std::string str;
+	do {
+		// lsd - least significant digit
+		auto lsd = static_cast<int>(x % 10);
+		x /= 10;
+		str.push_back(zero[lsd]);
+	} while (x != 0);
+
+	if (x < 0)
+		str.push_back('-');
+
+	std::reverse(str.begin(), str.end());
+	return str;
 }
 
 Codec::Codec()

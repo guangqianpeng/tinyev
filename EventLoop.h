@@ -33,6 +33,7 @@ public:
 	void removeChannel(Channel* channel);
 
 	void assertInLoopThread();
+	void assertNotInLoopThread();
 	bool isInLoopThread();
 
 private:

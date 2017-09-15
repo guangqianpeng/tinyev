@@ -114,6 +114,11 @@ void EventLoop::assertInLoopThread()
 	assert(isInLoopThread());
 }
 
+void EventLoop::assertNotInLoopThread()
+{
+	assert(!isInLoopThread());
+}
+
 bool EventLoop::isInLoopThread()
 {
 	pid_t x = gettid();

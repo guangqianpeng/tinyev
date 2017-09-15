@@ -11,18 +11,36 @@
 #include "TcpServer.h"
 #include "Codec.h"
 #include "TcpConnection.h"
+#include "EventLoopThread.h"
 
 
 class KthServer: noncopyable
 {
 public:
 	KthServer(EventLoop* loop, const InetAddress& addr, int64_t count)
-			: loop_(loop),
-			  server_(loop, addr)
+			: ioLoop_(loop),
+			  nThreads_(std::thread::hardware_concurrency()),
+			  server_(loop, addr),
+			  sum_(0),
+			  min_(INT64_MAX),
+			  max_(INT64_MIN)
 	{
-		generate(count, 0, INT32_MAX);
+		startWorkerThreads();
 
-		INFO("count: %ld, min: %ld, max: %ld", count_, min_, max_);
+		INFO("generate numbers...");
+		generateNumbers(count, 0, INT32_MAX);
+
+		INFO("sort in threads...");
+		runInThreads([this](std::vector<int64_t>& vec) {
+			std::sort(vec.begin(), vec.end());
+		});
+
+		for (auto& vec: numbers_) {
+			(void)vec;
+			assert(std::is_sorted(vec.begin(), vec.end()));
+		}
+		INFO("count: %ld, sum: %s, min: %ld, max: %ld",
+			 count_, toString(sum_).c_str(), min_, max_);
 
 		codec_.setQueryCallback(std::bind(
 				&KthServer::lessEqualCount, this, _1, _2));
@@ -46,18 +64,38 @@ private:
 
 	void lessEqualCount(const TcpConnectionPtr& conn, int64_t guess)
 	{
-		auto lower = std::lower_bound(numbers_.begin(), numbers_.end(), guess);
-		auto upper = std::upper_bound(numbers_.begin(), numbers_.end(), guess);
+		std::atomic<int64_t> lessCount(0);
+		std::atomic<int64_t> equalCount(0);
 
-		int64_t lessCount = lower - numbers_.begin();
-		int64_t equalCount = upper - lower;
+		// blocking calls
+		runInThreads([this, guess, &lessCount, &equalCount]
+							 (std::vector<int64_t>& vec){
+			auto lower = std::lower_bound(vec.begin(), vec.end(), guess);
+			auto upper = std::upper_bound(vec.begin(), vec.end(), guess);
+			int64_t t_lessCount = lower - vec.begin();
+			int64_t t_equalCount = upper - lower;
+			lessCount += t_lessCount;
+			equalCount += t_equalCount;
+		});
 
 		INFO("guess %ld, less %ld, equal %ld",
-			 guess, lessCount, equalCount);
+			 guess, int64_t(lessCount), int64_t(equalCount));
 		codec_.sendAnswer(conn, lessCount, equalCount);
 	}
 
-	void generate(int64_t count, int64_t min, int64_t max)
+	void startWorkerThreads()
+	{
+		for (int i = 0; i < nThreads_; ++i) {
+			auto thread = new EventLoopThread();
+			auto loop = thread->startLoop();
+			threads_.emplace_back(thread);
+			loops_.push_back(loop);
+		}
+
+		INFO("%d threads started", nThreads_);
+	}
+
+	void generateNumbers(int64_t count, int64_t min, int64_t max)
 	{
 		unsigned short xsubi[3];
 		xsubi[0] = static_cast<unsigned short>(getpid());
@@ -66,41 +104,69 @@ private:
 
 		assert(max >= min);
 
-		numbers_.reserve(static_cast<size_t>(count));
-
 		int64_t range = max - min;
-		for (int64_t i = 0; i < count; ++i) {
-			int64_t value = min;
-			if (range > 0) {
-				value += nrand48(xsubi) % range;
+		int64_t vecSize = count / nThreads_;
+
+		numbers_.resize(nThreads_);
+		for (auto& vec: numbers_) {
+			vec.reserve(vecSize + nThreads_);
+			for (int i = 0; i < vecSize; ++i) {
+				vec.push_back(generateOne(min, range, xsubi));
 			}
-			numbers_.push_back(value);
 		}
 
-		std::sort(numbers_.begin(), numbers_.end());
+		int64_t remain = count - vecSize * nThreads_;
+		while (--remain >= 0)
+			numbers_[0].push_back(generateOne(min, range, xsubi));
 
-		sum_ = 0;
-		for (int64_t i: numbers_)
-			sum_ += i;
 		count_ = count;
-		min_ = numbers_.front();
-		max_ = numbers_.back();
-
-#ifndef NDEBUG
-		for (int64_t i: numbers_)
-			printf("%ld ", i);
-		printf("\n");
-#endif
-
 	}
 
-	EventLoop* loop_;
+	int64_t generateOne(int64_t min, int64_t range, unsigned short *xsubi)
+	{
+		int64_t value = min;
+		if (range > 0) {
+			value += nrand48(xsubi) % range;
+		}
+		sum_ += value;
+		if (min_ > value) min_ = value;
+		if (max_ < value) max_ = value;
+
+		return value;
+	}
+
+	template <typename Func>
+	void runInThreads(Func&& func)
+	{
+		CountDownLatch latch(static_cast<int>(nThreads_));
+		for (int i = 0; i < nThreads_; ++i) {
+			loops_[i]->assertNotInLoopThread();
+			loops_[i]->queueInLoop([&latch, &func, i, this](){
+				loops_[i]->assertInLoopThread();
+				func(numbers_[i]);
+				latch.count();
+			});
+		}
+		latch.wait();
+	}
+
+	typedef std::vector<EventLoop*> WokerLoops;
+	typedef std::unique_ptr<EventLoopThread> ThreadPtr;
+	typedef std::vector<ThreadPtr> ThreadPtrList;
+	typedef std::vector<std::vector<int64_t>> Numbers;
+
+	EventLoop* ioLoop_;
+
+	WokerLoops loops_;
+	ThreadPtrList threads_;
+	Numbers numbers_;
+	const int nThreads_;
+
 	Codec codec_;
 	TcpServer server_;
 	__int128 sum_;
 	int64_t count_;
 	int64_t min_, max_;
-	std::vector<int64_t> numbers_;
 };
 
 void usage()

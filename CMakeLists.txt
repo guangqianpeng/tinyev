@@ -21,7 +21,7 @@ set(SOURCE_FILES
 		TcpServer.cc TcpServer.h
 		Buffer.h Buffer.cc
 		ThreadPool.cc ThreadPool.h
-		Connector.cc Connector.h TcpClient.cc TcpClient.h)
+		Connector.cc Connector.h TcpClient.cc TcpClient.h CountDownLatch.h EventLoopThread.cc EventLoopThread.h)
 add_subdirectory(kth_element)
 add_subdirectory(nqueen)
 add_subdirectory(trivial)
