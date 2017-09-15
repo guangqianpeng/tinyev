@@ -116,8 +116,8 @@ private:
 		nEqual_ += nEqual;
 		nAnsewered_++;
 
-		bool done = false;
 		if (allAnswered()) {
+			bool done = false;
 			if (nLess_ < kth_ ) {
 				if (nLess_ + nEqual_ >= kth_)
 					done = true;
