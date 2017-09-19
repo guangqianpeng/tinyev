@@ -8,6 +8,8 @@
 #include "Logger.h"
 #include "InetAddress.h"
 
+using namespace tinyev;
+
 InetAddress::InetAddress(uint16_t port, bool loopback)
 {
 	bzero(&addr_, sizeof(addr_));

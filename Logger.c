@@ -13,6 +13,10 @@
 
 #include "Logger.h"
 
+#ifdef __cplusplus
+using namespace tinyev;
+#endif
+
 #define MAXLINE     256
 
 static const char *log_level_str[] = {
@@ -23,12 +27,6 @@ static const char *log_level_str[] = {
         "[ERROR]",
         "[FATAL]"
 };
-
-#ifndef NDEBUG
-int logLevel = LOG_LEVEL_DEBUG;
-#else
-int logLevel = LOG_LEVEL_INFO;
-#endif
 
 static int log_fd = STDOUT_FILENO;
 

@@ -9,6 +9,11 @@
 #include "EventLoop.h"
 #include "TcpConnection.h"
 
+using namespace tinyev;
+
+namespace
+{
+
 void defaultThreadInitCallback(size_t index)
 {
 	TRACE("eventLoop thread #%lu started", index);
@@ -30,9 +35,6 @@ void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer& buffer)
 		  buffer.readableBytes());
 	buffer.retrieveAll();
 }
-
-namespace
-{
 
 enum ConnectionState
 {

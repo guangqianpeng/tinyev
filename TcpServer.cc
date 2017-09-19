@@ -8,6 +8,8 @@
 #include "EventLoop.h"
 #include "TcpServer.h"
 
+using namespace tinyev;
+
 TcpServer::TcpServer(EventLoop* loop, const InetAddress& local)
 		: baseLoop_(loop),
 		  numThreads_(0),

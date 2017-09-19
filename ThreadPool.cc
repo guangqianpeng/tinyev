@@ -7,6 +7,8 @@
 #include "Logger.h"
 #include "ThreadPool.h"
 
+using namespace tinyev;
+
 ThreadPool::ThreadPool(size_t numThread, size_t maxQueueSize, const ThreadInitCallback& cb)
 		: maxQueueSize_(maxQueueSize),
 		  running_(true),

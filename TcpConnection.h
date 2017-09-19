@@ -11,6 +11,9 @@
 #include "Channel.h"
 #include "InetAddress.h"
 
+namespace tinyev
+{
+
 class EventLoop;
 
 class TcpConnection: noncopyable,
@@ -78,5 +81,6 @@ private:
 	CloseCallback closeCallback_;
 };
 
+}
 
 #endif //TINYEV_TCPCONNECTION_H

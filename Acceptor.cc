@@ -10,6 +10,8 @@
 #include "InetAddress.h"
 #include "Acceptor.h"
 
+using namespace tinyev;
+
 namespace
 {
 

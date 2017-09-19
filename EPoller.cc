@@ -11,6 +11,8 @@
 #include "Channel.h"
 #include "EPoller.h"
 
+using namespace tinyev;
+
 EPoller::EPoller(EventLoop* loop)
 		:loop_(loop),
 		 events_(128),

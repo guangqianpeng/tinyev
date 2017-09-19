@@ -5,6 +5,8 @@
 
 // from muduo:Buffer
 
+using namespace tinyev;
+
 const char Buffer::kCRLF[] = "\r\n";
 
 const size_t Buffer::kCheapPrepend;

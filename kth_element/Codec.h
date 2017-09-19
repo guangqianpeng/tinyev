@@ -11,15 +11,19 @@
 #include "Callbacks.h"
 #include "noncopyable.h"
 
-class Codec: noncopyable
+class Codec: tinyev::noncopyable
 {
 public:
+	using tinyev::TcpConnectionPtr;
+	using tinyev::Buffer;
+
 	typedef std::function<void(const TcpConnectionPtr&, int64_t)> QueryCallback;
 	typedef std::function<void(const TcpConnectionPtr&, int64_t, int64_t)> AnswerCallback;
 	typedef std::function<void(const TcpConnectionPtr&,
 							   __int128, int64_t, int64_t, int64_t)> TellStateCallback;
 	typedef std::function<void(const TcpConnectionPtr&)> ParseErrorCallback;
 
+public:
 	Codec();
 
 	void parseMessage(const TcpConnectionPtr& conn, Buffer& buffer);

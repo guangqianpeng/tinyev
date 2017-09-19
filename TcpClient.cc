@@ -6,6 +6,8 @@
 #include "TcpConnection.h"
 #include "TcpClient.h"
 
+using namespace tinyev;
+
 TcpClient::TcpClient(EventLoop* loop, const InetAddress& peer)
 		: loop_(loop),
 		  connector_(loop, peer),

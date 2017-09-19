@@ -16,6 +16,9 @@
 #include "Callbacks.h"
 #include "noncopyable.h"
 
+namespace tinyev
+{
+
 class EventLoopThread;
 class TcpServerSingle;
 class EventLoop;
@@ -67,5 +70,6 @@ private:
 	WriteCompleteCallback writeCompleteCallback_;
 };
 
+}
 
 #endif //TINYEV_TCPSERVER_H

@@ -8,6 +8,9 @@
 #include <string>
 #include <netinet/in.h>
 
+namespace tinyev
+{
+
 class InetAddress
 {
 public:
@@ -31,5 +34,6 @@ private:
 	struct sockaddr_in addr_;
 };
 
+}
 
 #endif //TINYEV_INETADDRESS_H

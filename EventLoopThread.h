@@ -10,6 +10,9 @@
 #include "CountDownLatch.h"
 #include "noncopyable.h"
 
+namespace tinyev
+{
+
 class EventLoop;
 
 class EventLoopThread: noncopyable
@@ -29,5 +32,6 @@ private:
 	CountDownLatch latch_;
 };
 
+}
 
 #endif //TINYEV_EVENTLOOPTHREAD_H

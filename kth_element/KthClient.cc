@@ -10,6 +10,8 @@
 #include "TcpClient.h"
 #include "Codec.h"
 
+using namespace tinyev;
+
 class KthClient: noncopyable
 {
 public:

@@ -10,9 +10,13 @@
 
 #include "noncopyable.h"
 
+namespace tinyev
+{
+
 class CountDownLatch
 {
 public:
+	explicit
 	CountDownLatch(int count)
 			: count_(count)
 	{}
@@ -37,6 +41,8 @@ private:
 	std::mutex mutex_;
 	std::condition_variable cond_;
 };
+
+}
 
 
 #endif //TINYEV_COUNTDOWNLATCH_H

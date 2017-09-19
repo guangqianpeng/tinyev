@@ -7,6 +7,8 @@
 #include "EventLoopThread.h"
 #include "EventLoop.h"
 
+using namespace tinyev;
+
 EventLoopThread::EventLoopThread()
 		: loop_(nullptr),
 		  latch_(1)

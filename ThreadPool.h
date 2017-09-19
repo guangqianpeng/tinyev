@@ -11,9 +11,13 @@
 #include <vector>
 #include <deque>
 
+#include "noncopyable.h"
 #include "Callbacks.h"
 
-class ThreadPool
+namespace tinyev
+{
+
+class ThreadPool: noncopyable
 {
 public:
 	ThreadPool(size_t numThread,
@@ -43,5 +47,6 @@ private:
 	ThreadInitCallback threadInitCallback_;
 };
 
+}
 
 #endif //TINYEV_THREADPOOL_H

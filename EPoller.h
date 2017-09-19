@@ -9,6 +9,9 @@
 
 #include "noncopyable.h"
 
+namespace tinyev
+{
+
 class EventLoop;
 class Channel;
 
@@ -31,5 +34,6 @@ private:
 	int epollfd_;
 };
 
+}
 
 #endif //TINYEV_EPOLLER_H

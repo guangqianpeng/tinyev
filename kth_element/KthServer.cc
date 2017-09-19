@@ -13,18 +13,24 @@
 #include "TcpConnection.h"
 #include "EventLoopThread.h"
 
+using namespace tinyev;
 
 class KthServer: noncopyable
 {
 public:
-	KthServer(EventLoop* loop, const InetAddress& addr, int64_t count)
+	KthServer(EventLoop* loop, const InetAddress& addr, int64_t count, int nThreads)
 			: ioLoop_(loop),
-			  nThreads_(std::thread::hardware_concurrency()),
+			  nThreads_(nThreads),
 			  server_(loop, addr),
 			  sum_(0),
 			  min_(INT64_MAX),
 			  max_(INT64_MIN)
 	{
+		if (count <= 0)
+			FATAL("bad count");
+		if (nThreads <= 0)
+			FATAL("bad thread number");
+
 		startWorkerThreads();
 
 		INFO("generate numbers...");
@@ -171,7 +177,7 @@ private:
 
 void usage()
 {
-	printf("usage: ./KthServer #count\n");
+	printf("usage: ./KthServer #count [#thread]\n");
 	exit(EXIT_FAILURE);
 }
 
@@ -187,9 +193,16 @@ int main(int argc, char** argv)
 	if (*end != '\0')
 		usage();
 
+	size_t nThreads = std::thread::hardware_concurrency();
+	if (argc > 2) {
+		nThreads = strtoul(argv[2], &end, 10);
+		if (*end != '\0')
+			usage();
+	}
+
 	EventLoop loop;
 	InetAddress addr(9877);
-	KthServer server(&loop, addr, count);
+	KthServer server(&loop, addr, count, static_cast<int>(nThreads));
 	server.start();
 	loop.loop();
 }

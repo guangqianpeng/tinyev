@@ -8,6 +8,9 @@
 #include <memory>
 #include <functional>
 
+namespace tinyev
+{
+
 using std::placeholders::_1;
 using std::placeholders::_2;
 using std::placeholders::_3;
@@ -34,5 +37,7 @@ typedef std::function<void(size_t index)> ThreadInitCallback;
 void defaultThreadInitCallback(size_t index);
 void defaultConnectionCallback(const TcpConnectionPtr& conn);
 void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer& buffer);
+
+}
 
 #endif //TINYEV_CALLBACKS_H

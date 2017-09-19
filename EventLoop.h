@@ -14,6 +14,9 @@
 #include "EPoller.h"
 #include "noncopyable.h"
 
+namespace tinyev
+{
+
 class EventLoop: noncopyable
 {
 public:
@@ -50,5 +53,6 @@ private:
 	std::vector<Task> pendingTasks_;
 };
 
+}
 
 #endif //TINYEV_EVENTLOOP_H

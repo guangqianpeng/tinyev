@@ -7,6 +7,8 @@
 #include "EventLoop.h"
 #include "Channel.h"
 
+using namespace tinyev;
+
 Channel::Channel(EventLoop* loop, int fd)
 		: polling(false),
 		  loop_(loop),

@@ -8,7 +8,10 @@
 #include "Callbacks.h"
 #include "Connector.h"
 
-class TcpClient
+namespace tinyev
+{
+
+class TcpClient: noncopyable
 {
 public:
 	TcpClient(EventLoop* loop, const InetAddress& peer);
@@ -36,5 +39,6 @@ private:
 	WriteCompleteCallback writeCompleteCallback_;
 };
 
+}
 
 #endif //TINYEV_TCPCLIENT_H

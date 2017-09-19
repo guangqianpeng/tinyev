@@ -11,6 +11,9 @@
 #include "Channel.h"
 #include "noncopyable.h"
 
+namespace tinyev
+{
+
 class EventLoop;
 class InetAddress;
 
@@ -39,6 +42,8 @@ private:
 	NewConnectionCallback newConnectionCallback_;
 	ErrorCallback errorCallback_;
 };
+
+}
 
 
 #endif //TINYEV_CONNECTOR_H

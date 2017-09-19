@@ -5,6 +5,8 @@
 #ifndef TINYEV_NONCOPYABLE_H
 #define TINYEV_NONCOPYABLE_H
 
+namespace tinyev
+{
 
 class noncopyable
 {
@@ -16,5 +18,6 @@ private:
 	void operator=(const noncopyable&) = delete;
 };
 
+}
 
 #endif //TINYEV_NONCOPYABLE_H

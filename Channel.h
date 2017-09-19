@@ -11,6 +11,9 @@
 
 #include "noncopyable.h"
 
+namespace tinyev
+{
+
 class EventLoop;
 
 class Channel: noncopyable
@@ -82,5 +85,7 @@ private:
 	ErrorCallback errorCallback_;
 };
 
+
+}
 
 #endif //TINYEV_CHANNEL_H

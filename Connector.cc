@@ -11,6 +11,8 @@
 #include "Logger.h"
 #include "Connector.h"
 
+using namespace tinyev;
+
 namespace
 {
 

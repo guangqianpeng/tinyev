@@ -12,6 +12,8 @@
 #define STATE	'#'
 #define ANSWER	'$'
 
+using namespace tinyev;
+
 namespace
 {
 

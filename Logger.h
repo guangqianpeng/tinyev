@@ -17,19 +17,22 @@ extern "C" {
 #define LOG_LEVEL_FATAL     5
 
 extern int logLevel;
+
 void setLogLevel(int level);
+
 void setLogFd(int fd);
 
 /* private, do not use  */
 void log_base(const char *file,
-              int line,
-              int level,
-              int to_abort,
-              const char *fmt, ...);
+			  int line,
+			  int level,
+			  int to_abort,
+			  const char *fmt, ...);
+
 void log_sys(const char *file,
-             int line,
-             int to_abort,
-             const char *fmt, ...);
+			 int line,
+			 int to_abort,
+			 const char *fmt, ...);
 
 /* private, do not use  */
 #define LOG_BASE(level, to_abort, fmt, ...) \
@@ -50,6 +53,7 @@ LOG_BASE(LOG_LEVEL_WARN, 0, fmt, ##__VA_ARGS__)
 #define FATAL(fmt, ...)     LOG_BASE(LOG_LEVEL_FATAL, 1, fmt, ##__VA_ARGS__)
 #define SYSERR(fmt, ...)    LOG_SYS(0, fmt, ##__VA_ARGS__)
 #define SYSFATAL(fmt, ...)  LOG_SYS(1, fmt, ##__VA_ARGS__)
+
 
 #ifdef __cplusplus
 }
