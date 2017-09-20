@@ -12,6 +12,8 @@
 #include "ThreadPool.h"
 #include "Codec.h"
 
+using namespace tinyev;
+
 class BackTrack
 {
 public:

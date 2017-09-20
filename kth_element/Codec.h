@@ -14,8 +14,8 @@
 class Codec: tinyev::noncopyable
 {
 public:
-	using tinyev::TcpConnectionPtr;
-	using tinyev::Buffer;
+	using TcpConnectionPtr = tinyev::TcpConnectionPtr;
+	using Buffer = tinyev::Buffer;
 
 	typedef std::function<void(const TcpConnectionPtr&, int64_t)> QueryCallback;
 	typedef std::function<void(const TcpConnectionPtr&, int64_t, int64_t)> AnswerCallback;

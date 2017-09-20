@@ -2,8 +2,8 @@
 // Created by frank on 17-2-12.
 //
 
-#ifndef FANCY_ERROR_H
-#define FANCY_ERROR_H
+#ifndef FANCY_LOGGER_H
+#define FANCY_LOGGER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,4 +59,4 @@ LOG_BASE(LOG_LEVEL_WARN, 0, fmt, ##__VA_ARGS__)
 }
 #endif
 
-#endif //FANCY_ERROR_H
+#endif //FANCY_LOGGER_H

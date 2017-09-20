@@ -10,12 +10,13 @@ namespace tinyev
 
 class noncopyable
 {
+public:
+	noncopyable(const noncopyable&) = delete;
+	void operator=(const noncopyable&) = delete;
+
 protected:
 	noncopyable() = default;
 	~noncopyable() = default;
-private:
-	noncopyable(const noncopyable&) = delete;
-	void operator=(const noncopyable&) = delete;
 };
 
 }

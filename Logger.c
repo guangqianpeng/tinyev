@@ -13,11 +13,13 @@
 
 #include "Logger.h"
 
-#ifdef __cplusplus
-using namespace tinyev;
-#endif
-
 #define MAXLINE     256
+
+#ifndef NDEBUG
+int logLevel = LOG_LEVEL_DEBUG;
+#else
+int logLevel = LOG_LEVEL_INFO;
+#endif
 
 static const char *log_level_str[] = {
         "[TRACE]",

@@ -10,6 +10,8 @@
 #include "TcpClient.h"
 #include "Codec.h"
 
+using namespace tinyev;
+
 const static int64_t answerSheet[] = {0, 1, 0, 0, 2, 10, 4, 40, 92, // 8
 									  352, 724, 2680, 14200, 73712, // 13
 									  365596, 2279184, 14772512, 95815104, // 17

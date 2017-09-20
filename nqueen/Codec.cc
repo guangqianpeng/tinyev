@@ -8,6 +8,8 @@
 #include "Logger.h"
 #include "Codec.h"
 
+using namespace tinyev;
+
 namespace
 {
 

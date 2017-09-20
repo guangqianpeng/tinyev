@@ -11,8 +11,16 @@
 
 using namespace tinyev;
 
-namespace
+namespace tinyev
 {
+
+enum ConnectionState
+{
+	kConnecting,
+	kConnected,
+	kDisconnecting,
+	kDisconnected
+};
 
 void defaultThreadInitCallback(size_t index)
 {
@@ -24,7 +32,7 @@ void defaultConnectionCallback(const TcpConnectionPtr& conn)
 	INFO("connection %s -> %s %s",
 		 conn->peer().toIpPort().c_str(),
 		 conn->local().toIpPort().c_str(),
-		 conn->connected() ? "up":"down");
+		 conn->connected() ? "up" : "down");
 }
 
 void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer& buffer)
@@ -36,16 +44,7 @@ void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer& buffer)
 	buffer.retrieveAll();
 }
 
-enum ConnectionState
-{
-	kConnecting,
-	kConnected,
-	kDisconnecting,
-	kDisconnected
-};
-
 }
-
 TcpConnection::TcpConnection(EventLoop *loop, int sockfd,
 							 const InetAddress& local,
 							 const InetAddress& peer)
@@ -254,7 +253,6 @@ void TcpConnection::handleWrite()
 	}
 	else {
 		outputBuffer_.retrieve(static_cast<size_t>(n));
-		// todo add writeComplete
 		if (outputBuffer_.readableBytes() == 0) {
 			channel_.disableWrite();
 			if (state_ == kDisconnecting)

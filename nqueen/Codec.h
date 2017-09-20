@@ -24,13 +24,13 @@ struct Response
 	std::vector<uint32_t> cols;
 };
 
-class Codec: noncopyable
+class Codec: tinyev::noncopyable
 {
 public:
-	typedef std::function<void(const TcpConnectionPtr&, const Request&)> RequestCallback;
-	typedef std::function<void(const TcpConnectionPtr&, const Response&)> ResponseCallback;
-	typedef std::function<void(const TcpConnectionPtr&, uint32_t)> TellCoresCallback;
-	typedef std::function<void(const TcpConnectionPtr&)> ParseErrorCallback;
+	typedef std::function<void(const tinyev::TcpConnectionPtr&, const Request&)> RequestCallback;
+	typedef std::function<void(const tinyev::TcpConnectionPtr&, const Response&)> ResponseCallback;
+	typedef std::function<void(const tinyev::TcpConnectionPtr&, uint32_t)> TellCoresCallback;
+	typedef std::function<void(const tinyev::TcpConnectionPtr&)> ParseErrorCallback;
 
 	explicit
 	Codec(const RequestCallback& cb);
@@ -39,11 +39,11 @@ public:
 	void setParseErrorCallback(const ParseErrorCallback& cb)
 	{ parseErrorCallback_ = cb; }
 
-	void parseMessage(const TcpConnectionPtr& conn, Buffer& buffer);
+	void parseMessage(const tinyev::TcpConnectionPtr& conn, tinyev::Buffer& buffer);
 
-	void send(const TcpConnectionPtr& conn, const Request& rqst);
-	void send(const TcpConnectionPtr& conn, const Response& rsps);
-	void send(const TcpConnectionPtr& conn, uint32_t nCores);
+	void send(const tinyev::TcpConnectionPtr& conn, const Request& rqst);
+	void send(const tinyev::TcpConnectionPtr& conn, const Response& rsps);
+	void send(const tinyev::TcpConnectionPtr& conn, uint32_t nCores);
 
 private:
 	RequestCallback requestCallback_;
