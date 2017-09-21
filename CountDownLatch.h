@@ -13,7 +13,7 @@
 namespace tinyev
 {
 
-class CountDownLatch
+class CountDownLatch: noncopyable
 {
 public:
 	explicit

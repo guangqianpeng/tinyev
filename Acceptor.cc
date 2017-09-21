@@ -64,7 +64,8 @@ void Acceptor::handleRead()
 	struct sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 
-	int sockfd = ::accept4(acceptFd_, (struct sockaddr*)&addr,
+	void* any = &addr;
+	int sockfd = ::accept4(acceptFd_, static_cast<sockaddr*>(any),
 						   &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
 	if (sockfd == -1) {
 		int savedErrno = errno;

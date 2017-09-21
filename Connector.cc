@@ -78,7 +78,8 @@ void Connector::handleWrtie()
 	else if (newConnectionCallback_) {
 		struct sockaddr_in addr;
 		len = sizeof(addr);
-		ret = ::getsockname(sockfd_,(struct sockaddr*)&addr, &len);
+        void* any = &addr;
+		ret = ::getsockname(sockfd_, static_cast<sockaddr*>(any), &len);
 		if (ret == -1)
 			SYSERR("Connection::getsockname()");
 		InetAddress local;
