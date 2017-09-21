@@ -7,6 +7,8 @@
 #include "TcpConnection.h"
 #include "TcpServer.h"
 
+using namespace tinyev;
+
 class HelloServer
 {
 public:
