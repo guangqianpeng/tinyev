@@ -29,6 +29,8 @@ public:
 	{ messageCallback_ = cb; }
 	void setWriteCompleteCallback(const WriteCompleteCallback& cb)
 	{ writeCompleteCallback_ = cb; }
+    void setHighWaterMarkCallback(const HighWaterMarkCallback& cb, size_t mark)
+    { highWaterMarkCallback_ = cb; highWaterMark_ = mark; }
 
 	// internal use
 	void setCloseCallBack(const CloseCallback& cb)
@@ -55,6 +57,14 @@ public:
 	void shutdown();
 	void forceClose();
 
+	void stopRead();
+	void startRead();
+	bool isReading() // not thread safe
+	{ return channel_.isReading(); };
+
+    const Buffer& inputBuffer() const { return inputBuffer_; }
+    const Buffer& outputBuffer() const { return outputBuffer_; }
+
 private:
 	void handleRead();
 	void handleWrite();
@@ -76,8 +86,10 @@ private:
 	InetAddress peer_;
 	Buffer inputBuffer_;
 	Buffer outputBuffer_;
+    size_t highWaterMark_;
 	MessageCallback messageCallback_;
 	WriteCompleteCallback writeCompleteCallback_;
+    HighWaterMarkCallback highWaterMarkCallback_;
 	CloseCallback closeCallback_;
 };
 

@@ -54,6 +54,8 @@ public:
 	{ events_ |= (EPOLLIN | EPOLLPRI); update();}
 	void enableWrite()
 	{ events_ |= EPOLLOUT; update();}
+	void disableRead()
+	{ events_ &= ~EPOLLIN; update(); }
 	void disableWrite()
 	{ events_ &= ~EPOLLOUT; update();}
 	void disableAll()

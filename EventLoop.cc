@@ -7,6 +7,7 @@
 #include <sys/types.h> // pid_t
 #include <unistd.h>	// syscall()
 #include <syscall.h> // SYS_gettid
+#include <signal.h>
 
 #include "Logger.h"
 #include "Channel.h"
@@ -23,6 +24,17 @@ pid_t gettid()
 {
 	return static_cast<pid_t>(::syscall(SYS_gettid));
 }
+
+class IgnoreSigPipe
+{
+public:
+	IgnoreSigPipe()
+	{
+		::signal(SIGPIPE, SIG_IGN);
+	}
+};
+
+IgnoreSigPipe ignore;
 
 }
 

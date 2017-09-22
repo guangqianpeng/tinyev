@@ -46,7 +46,6 @@ public:
 	void setWriteCompleteCallback(const WriteCompleteCallback& cb)
 	{ writeCompleteCallback_ = cb; }
 
-
 private:
 	void runInThread(size_t index);
 

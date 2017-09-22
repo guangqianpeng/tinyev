@@ -45,6 +45,7 @@ void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer& buffer)
 }
 
 }
+
 TcpConnection::TcpConnection(EventLoop *loop, int sockfd,
 							 const InetAddress& local,
 							 const InetAddress& peer)
@@ -53,7 +54,8 @@ TcpConnection::TcpConnection(EventLoop *loop, int sockfd,
 		  channel_(loop, sockfd_),
 		  state_(kConnecting),
 		  local_(local),
-		  peer_(peer)
+		  peer_(peer),
+		  highWaterMark_(0)
 {
 	channel_.setReadCallback([this](){handleRead();});
 	channel_.setWriteCallback([this](){handleWrite();});
@@ -126,6 +128,8 @@ void TcpConnection::sendInLoop(const char *data, size_t len)
 		else {
 			remain -= static_cast<size_t>(n);
 			if (remain == 0 && writeCompleteCallback_) {
+				// user may send data in writeCompleteCallback_
+				// queueInLoop can break the chain
 				loop_->queueInLoop(std::bind(
 						writeCompleteCallback_, shared_from_this()));
 			}
@@ -133,6 +137,13 @@ void TcpConnection::sendInLoop(const char *data, size_t len)
 	}
 	// todo: add highWaterMark
 	if (!faultError && remain > 0) {
+		if (highWaterMarkCallback_) {
+			size_t oldLen = outputBuffer_.readableBytes();
+			size_t newLen = oldLen + remain;
+			if (oldLen < highWaterMark_ && newLen >= highWaterMark_)
+				loop_->queueInLoop(std::bind(
+						highWaterMarkCallback_, shared_from_this(), newLen));
+		}
 		outputBuffer_.append(data + n, remain);
 		channel_.enableWrite();
 	}
@@ -215,6 +226,21 @@ void TcpConnection::forceCloseInLoop()
 	}
 }
 
+void TcpConnection::stopRead()
+{
+	loop_->runInLoop([this]() {
+		if (channel_.isReading())
+			channel_.disableRead();
+	});
+}
+
+void TcpConnection::startRead()
+{
+	loop_->runInLoop([this]() {
+		if (!channel_.isReading())
+			channel_.enableRead();
+	});
+}
 
 int TcpConnection::stateAtomicGetAndSet(int newState)
 {

@@ -13,15 +13,18 @@ class EchoServer
 {
 public:
 	EchoServer(EventLoop* loop, const InetAddress& addr)
-			: server(loop, addr)
+			: loop_(loop),
+			  server_(loop, addr)
 	{
-		server.setConnectionCallback(std::bind(
+		server_.setConnectionCallback(std::bind(
 				&EchoServer::onConnection, this, _1));
-		server.setMessageCallback(std::bind(
+		server_.setMessageCallback(std::bind(
 				&EchoServer::onMessage, this, _1, _2));
+		server_.setWriteCompleteCallback(std::bind(
+				&EchoServer::onWriteComplete, this, _1));
 	}
 
-	void start() { server.start(); }
+	void start() { server_.start(); }
 
 	void onConnection(const TcpConnectionPtr& conn)
 	{
@@ -29,8 +32,12 @@ public:
 			 conn->name().c_str(),
 			 conn->connected() ? "up":"down");
 
-		if (conn->connected())
+		if (conn->connected()) {
 			conn->send("[tinyev echo server]\n");
+			conn->setHighWaterMarkCallback(
+					std::bind(&EchoServer::onHighWaterMark, this, _1, _2),
+					1024);
+		}
 	}
 
 	void onMessage(const TcpConnectionPtr& conn, Buffer& buffer)
@@ -39,11 +46,27 @@ public:
 			 conn->name().c_str(),
 			 buffer.readableBytes());
 
+        // send will retrieve the buffer
 		conn->send(buffer);
 	}
 
+	void onHighWaterMark(const TcpConnectionPtr& conn, size_t mark)
+	{
+		INFO("high water mark %lu bytes, stop read", mark);
+		conn->stopRead();
+	}
+
+	void onWriteComplete(const TcpConnectionPtr& conn)
+	{
+		if (!conn->isReading()) {
+			INFO("write complete, start read");
+			conn->startRead();
+		}
+	}
+
 private:
-	TcpServer server;
+	EventLoop* loop_;
+	TcpServer server_;
 };
 
 int main()
