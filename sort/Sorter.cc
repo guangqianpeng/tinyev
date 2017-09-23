@@ -191,13 +191,13 @@ public:
     void sort(size_t batchSize)
     {
         assert(!sorted_);
-        DEBUG("input '%s', output '%s', batchSize %lu",
+        INFO("input '%s', output '%s', batchSize %lu",
               input_.name(), output_.name(), batchSize);
-        DEBUG("split and sort...", blocks_.size());
+        INFO("split and sort...", blocks_.size());
         splitAndSortBlocks(batchSize);
-        DEBUG("merge %lu blocks...", blocks_.size());
+        INFO("merge %lu blocks...", blocks_.size());
         mergeBlocks();
-        DEBUG("done");
+        INFO("done");
         sorted_ = true;
     }
 
@@ -228,7 +228,7 @@ private:
 
             blocks_.emplace_back(block);
 
-            DEBUG("[%d/%lu] blocks done", i + 1, blocks_.size());
+            INFO("[%d/%lu] blocks done", i + 1, blocks_.size());
 
             if (vec.size() < batchSize)
                 break;
