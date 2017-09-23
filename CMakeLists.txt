@@ -43,10 +43,13 @@ set(SOURCE_FILES
 		Connector.cc Connector.h
 		TcpClient.cc TcpClient.h
 		CountDownLatch.h
-		EventLoopThread.cc EventLoopThread.h)
+		EventLoopThread.cc EventLoopThread.h sort/Sorter.cc)
+
+include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(kth_element)
 add_subdirectory(nqueen)
+add_subdirectory(sort)
 add_subdirectory(trivial)
 
 add_library(tinyev STATIC ${SOURCE_FILES})

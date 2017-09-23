@@ -55,6 +55,7 @@ std::string toString(__int128 x)
 			  '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 	static const char* zero = &digits[9];
 
+	bool negtive = (x < 0);
 	std::string str;
 	do {
 		// lsd - least significant digit
@@ -63,7 +64,7 @@ std::string toString(__int128 x)
 		str.push_back(zero[lsd]);
 	} while (x != 0);
 
-	if (x < 0)
+	if (negtive)
 		str.push_back('-');
 
 	std::reverse(str.begin(), str.end());
