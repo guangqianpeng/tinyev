@@ -212,15 +212,19 @@ private:
 
         for (int i = 0; ; i++) {
 
+            INFO("proccess block %d...", i);
+            INFO("  read block %d...", i);
             input_.readBatch(vec, batchSize);
             if (vec.empty())
                 break;
 
+            INFO("  sort block %d...");
             std::sort(vec.begin(), vec.end());
 
             char name[32];
             snprintf(name, 32, "%s-shard-%04d", input_.name(), i);
 
+            INFO("  write block %d...");
             auto block = new Block(name, "wb+");
             block->writeBatch(vec);
             block->rewind();
