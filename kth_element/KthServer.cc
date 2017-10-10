@@ -23,6 +23,7 @@ public:
 			  nThreads_(nThreads),
 			  server_(loop, addr),
 			  sum_(0),
+              count_(count),
 			  min_(INT64_MAX),
 			  max_(INT64_MIN)
 	{
@@ -124,11 +125,9 @@ private:
 		int64_t remain = count - vecSize * nThreads_;
 		while (--remain >= 0)
 			numbers_[0].push_back(generateOne(min, range, xsubi));
-
-		count_ = count;
 	}
 
-	int64_t generateOne(int64_t min, int64_t range, unsigned short *xsubi)
+	int64_t generateOne(int64_t min, int64_t range, unsigned short* xsubi)
 	{
 		int64_t value = min;
 		if (range > 0) {
@@ -144,7 +143,7 @@ private:
 	template <typename Func>
 	void runInThreads(Func&& func)
 	{
-		CountDownLatch latch(static_cast<int>(nThreads_));
+		CountDownLatch latch(nThreads_);
 		for (int i = 0; i < nThreads_; ++i) {
 			loops_[i]->assertNotInLoopThread();
 			loops_[i]->queueInLoop([&latch, &func, i, this](){
