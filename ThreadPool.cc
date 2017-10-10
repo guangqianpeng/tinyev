@@ -57,8 +57,8 @@ void ThreadPool::runInThread(size_t index)
 	if (threadInitCallback_)
 		threadInitCallback_(index);
 	while (running_) {
-		Task task = take();
-		if (task) task();
+		if (Task task = take())
+			task();
 	}
 }
 
