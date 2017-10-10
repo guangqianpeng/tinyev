@@ -35,6 +35,14 @@ public:
     { return feof_unlocked(file_) != 0; }
     void unlink()
     { ::unlink(name_.c_str()); }
+    void flush()
+    { ::fflush_unlocked(file_); }
+
+public:
+    virtual void readBatch(std::vector<int64_t>& vec, size_t maxSize) = 0;
+    virtual bool readOne(int64_t* x) = 0;
+    virtual void writeBatch(const std::vector<int64_t>& vec) = 0;
+    virtual void writeOne(int64_t x) = 0;
 
 protected:
     const std::string name_;
@@ -44,11 +52,11 @@ protected:
 class FileOfBinary: public File
 {
 public:
-    FileOfBinary(const char *name, const char *mode)
+    FileOfBinary(const char* name, const char* mode)
             : File(name, mode)
     {}
 
-    void readBatch(std::vector<int64_t> &vec, size_t maxSize)
+    void readBatch(std::vector<int64_t>& vec, size_t maxSize) override
     {
         assert(!eof());
         vec.resize(maxSize);
@@ -60,7 +68,7 @@ public:
         }
     }
 
-    bool readOne(int64_t* x)
+    bool readOne(int64_t* x) override
     {
         assert(!eof());
         size_t n = fread_unlocked(x, sizeof(int64_t), 1, file_);
@@ -72,11 +80,18 @@ public:
         return true;
     }
 
-    void writeBatch(const std::vector<int64_t> &vec)
+    void writeBatch(const std::vector<int64_t>& vec) override
     {
         size_t n = fwrite_unlocked(vec.data(), sizeof(int64_t), vec.size(), file_);
         if (n != vec.size())
-            FATAL("fwrite()");
+            SYSFATAL("fwrite()");
+    }
+
+    void writeOne(int64_t x) override
+    {
+        size_t n = fwrite_unlocked(&x, sizeof(int64_t), 1, file_);
+        if (n != 1)
+            SYSFATAL("fwrite()");
     }
 
     int64_t at(size_t index) const
@@ -96,12 +111,12 @@ public:
 class FileOfText: public File
 {
 public:
-    FileOfText(const char* name, const char *mode)
+    FileOfText(const char* name, const char* mode)
             :File(name, mode)
     {}
 
 
-    void readBatch(std::vector<int64_t> &vec, size_t maxSize)
+    void readBatch(std::vector<int64_t>& vec, size_t maxSize) override
     {
         vec.clear();
         vec.reserve(maxSize);
@@ -123,7 +138,20 @@ public:
         }
     }
 
-    void writeBatch(const std::vector<int64_t> &vec)
+    bool readOne(int64_t* x) override
+    {
+        char buf[32];
+        char* ret = fgets_unlocked(buf, 32, file_);
+        if (ret == nullptr) {
+            if (!eof())
+                SYSFATAL("fgets()");
+            return false;
+        }
+        *x = toIntOrDie(buf);
+        return true;
+    }
+
+    void writeBatch(const std::vector<int64_t>& vec) override
     {
         char buf[32];
         for(int64_t x: vec) {
@@ -133,7 +161,7 @@ public:
         }
     }
 
-    void writeOne(int64_t x)
+    void writeOne(int64_t x) override
     {
         char buf[32];
         char* p = toString(x, buf);
@@ -144,12 +172,12 @@ public:
     }
 
 private:
-    static char* toString(int64_t x, char *buf)
+    static char* toString(int64_t x, char* buf)
     {
         static const char digits[19] = {
                 '9', '8', '7', '6', '5', '4', '3', '2', '1', '0',
                 '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        static const char *zero = &digits[9];
+        static const char* zero = &digits[9];
 
         bool negative = (x < 0);
         char* p = buf;
@@ -168,7 +196,7 @@ private:
         return p;
     }
 
-    static int64_t toIntOrDie(const char *buf)
+    static int64_t toIntOrDie(const char* buf)
     {
         char* end;
         errno = 0;
@@ -182,9 +210,9 @@ private:
 class Sorter: noncopyable
 {
 public:
-    Sorter(const char* inputFileName, const char* outputFileName)
+    Sorter(const char* inputFileName, File* output)
             : input_(inputFileName, "r"),
-              output_(outputFileName, "w"),
+              output_(output),
               sorted_(false)
     {}
 
@@ -192,7 +220,7 @@ public:
     {
         assert(!sorted_);
         INFO("input '%s', output '%s', batchSize %lu",
-              input_.name(), output_.name(), batchSize);
+              input_.name(), output_->name(), batchSize);
         INFO("split and sort...", blocks_.size());
         splitAndSortBlocks(batchSize);
         INFO("merge %lu blocks...", blocks_.size());
@@ -214,11 +242,12 @@ private:
 
             INFO("proccess block %d...", i);
             INFO("  read block %d...", i);
+            // fixme: strtol is cpu bounded
             input_.readBatch(vec, batchSize);
             if (vec.empty())
                 break;
 
-            INFO("  sort block %d...");
+            INFO("  sort block %d...", i);
             std::sort(vec.begin(), vec.end());
 
             char name[32];
@@ -227,6 +256,7 @@ private:
             INFO("  write block %d...");
             auto block = new Block(name, "wb+");
             block->writeBatch(vec);
+            block->flush();
             block->rewind();
             block->unlink();
 
@@ -253,7 +283,7 @@ private:
         while (!records.empty()) {
             std::pop_heap(records.begin(), records.end());
             auto& r = records.back();
-            output_.writeOne(r.elem);
+            output_->writeOne(r.elem);
             if (r.next())
                 std::push_heap(records.begin(), records.end());
             else
@@ -274,7 +304,7 @@ private:
     };
 
     FileOfText input_;
-    FileOfText output_;
+    File* output_;
     BlockPtrList blocks_;
     bool sorted_;
 };
@@ -285,7 +315,9 @@ int main(int argc, char** argv)
         printf("usage: ./sort input output batchSize\n");
         return 1;
     }
+
     size_t batchSize = strtoul(argv[3], nullptr, 10);
-    Sorter sorter(argv[1], argv[2]);
+    FileOfBinary output(argv[2], "wb");
+    Sorter sorter(argv[1], &output);
     sorter.sort(batchSize);
 }
