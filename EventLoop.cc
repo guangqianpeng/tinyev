@@ -8,6 +8,7 @@
 #include <unistd.h>	// syscall()
 #include <syscall.h> // SYS_gettid
 #include <signal.h>
+#include <numeric>
 
 #include "Logger.h"
 #include "Channel.h"
@@ -44,7 +45,8 @@ EventLoop::EventLoop()
 		  doingPendingTasks_(false),
 		  poller_(this),
 		  wakeupFd_(::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK)),
-		  wakeupChannel_(this, wakeupFd_)
+		  wakeupChannel_(this, wakeupFd_),
+          timerQueue_(this)
 {
 	if (wakeupFd_ == -1)
 		SYSFATAL("EventLoop::eventfd()");
@@ -100,6 +102,24 @@ void EventLoop::queueInLoop(const Task& task)
 	}
 	if (!isInLoopThread() || doingPendingTasks_)
 		wakeup();
+}
+
+void EventLoop::runAt(Timestamp when, TimerCallback callback)
+{
+    timerQueue_.addTimer(std::move(callback), when, Millisecond::zero());
+}
+
+void EventLoop::runAfter(Nanoseconds interval, TimerCallback callback)
+{
+    runAt(Clock::now() + interval, std::move(callback));
+}
+
+
+void EventLoop::runEvery(Nanoseconds interval, TimerCallback callback)
+{
+    timerQueue_.addTimer(std::move(callback),
+                         Clock::now() + interval,
+                         interval);
 }
 
 void EventLoop::wakeup()

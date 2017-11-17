@@ -9,10 +9,8 @@
 #include <vector>
 #include <sys/types.h>
 
-#include "Callbacks.h"
-#include "Channel.h"
 #include "EPoller.h"
-#include "noncopyable.h"
+#include "TimerQueue.h"
 
 namespace tinyev
 {
@@ -29,6 +27,10 @@ public:
 
 	void runInLoop(const Task& task);
 	void queueInLoop(const Task& task);
+
+	void runAt(Timestamp when, TimerCallback callback);
+    void runAfter(Nanoseconds interval, TimerCallback callback);
+    void runEvery(Nanoseconds interval, TimerCallback callback);
 
 	void wakeup();
 
@@ -51,6 +53,7 @@ private:
 	Channel wakeupChannel_;
 	std::mutex mutex_;
 	std::vector<Task> pendingTasks_;
+    TimerQueue timerQueue_;
 };
 
 }

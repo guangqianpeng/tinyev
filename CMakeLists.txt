@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(tinyev)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release")
@@ -17,11 +17,12 @@ set(CXX_FLAGS
 		-Woverloaded-virtual
 		-Wpointer-arith
 		-Wshadow
-		-Wwrite-strings)
+		-Wwrite-strings
+        -march=native
+        -rdynamic)
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
 set(CMAKE_CXX_COMPILER "g++")
-#set(CMAKE_CXX_FLAGS_DEBUG "-Og")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -finline-limit=1000 -DNDEBUG")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
@@ -43,7 +44,10 @@ set(SOURCE_FILES
 		Connector.cc Connector.h
 		TcpClient.cc TcpClient.h
 		CountDownLatch.h
-		EventLoopThread.cc EventLoopThread.h sort/Sorter.cc)
+		EventLoopThread.cc EventLoopThread.h
+        TimerQueue.cc TimerQueue.h
+        Timer.h
+		Timestamp.h)
 
 include_directories(${PROJECT_SOURCE_DIR})
 

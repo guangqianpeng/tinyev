@@ -35,6 +35,7 @@ typedef std::function<void(int sockfd,
 
 typedef std::function<void()> Task;
 typedef std::function<void(size_t index)> ThreadInitCallback;
+typedef std::function<void()> TimerCallback;
 
 void defaultThreadInitCallback(size_t index);
 void defaultConnectionCallback(const TcpConnectionPtr& conn);
