@@ -19,22 +19,22 @@ class EventLoop;
 class Acceptor:noncopyable
 {
 public:
-	Acceptor(EventLoop* loop, const InetAddress& local);
-	~Acceptor();
+    Acceptor(EventLoop* loop, const InetAddress& local);
+    ~Acceptor();
 
 
-	void setNewConnectionCallback(const NewConnectionCallback& cb)
-	{ newConnectionCallback_ = cb; }
+    void setNewConnectionCallback(const NewConnectionCallback& cb)
+    { newConnectionCallback_ = cb; }
 
 private:
-	void handleRead();
+    void handleRead();
 
-	EventLoop* loop_;
-	const int acceptFd_;
-	Channel acceptChannel_;
-	InetAddress local_;
-	bool listening_;
-	NewConnectionCallback newConnectionCallback_;
+    EventLoop* loop_;
+    const int acceptFd_;
+    Channel acceptChannel_;
+    InetAddress local_;
+    bool listening_;
+    NewConnectionCallback newConnectionCallback_;
 };
 
 }

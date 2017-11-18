@@ -10,32 +10,32 @@
 using namespace tinyev;
 
 EventLoopThread::EventLoopThread()
-		: loop_(nullptr),
-		  latch_(1)
+        : loop_(nullptr),
+          latch_(1)
 {}
 
 EventLoopThread::~EventLoopThread()
 {
-	if (loop_ != nullptr) {
-		loop_->quit();
-		thread_.join();
-	}
+    if (loop_ != nullptr) {
+        loop_->quit();
+        thread_.join();
+    }
 }
 
 EventLoop* EventLoopThread::startLoop()
 {
-	assert(loop_ == nullptr);
-	thread_ = std::thread([this](){runInThread();});
-	latch_.wait();
-	assert(loop_ != nullptr);
-	return loop_;
+    assert(loop_ == nullptr);
+    thread_ = std::thread([this](){runInThread();});
+    latch_.wait();
+    assert(loop_ != nullptr);
+    return loop_;
 }
 
 void EventLoopThread::runInThread()
 {
-	EventLoop loop;
-	loop_ = &loop;
-	latch_.count();
-	loop.loop();
-	loop_ = nullptr;
+    EventLoop loop;
+    loop_ = &loop;
+    latch_.count();
+    loop.loop();
+    loop_ = nullptr;
 }

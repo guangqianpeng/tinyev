@@ -18,18 +18,18 @@ class EventLoop;
 class EventLoopThread: noncopyable
 {
 public:
-	EventLoopThread();
-	~EventLoopThread();
+    EventLoopThread();
+    ~EventLoopThread();
 
-	EventLoop* startLoop();
+    EventLoop* startLoop();
 
 private:
-	void runInThread();
+    void runInThread();
 
 
-	EventLoop* loop_;
-	std::thread thread_;
-	CountDownLatch latch_;
+    EventLoop* loop_;
+    std::thread thread_;
+    CountDownLatch latch_;
 };
 
 }

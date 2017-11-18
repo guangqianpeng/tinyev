@@ -20,27 +20,27 @@ class InetAddress;
 class Connector: noncopyable
 {
 public:
-	Connector(EventLoop* loop, const InetAddress& peer);
-	~Connector();
+    Connector(EventLoop* loop, const InetAddress& peer);
+    ~Connector();
 
-	void start();
+    void start();
 
-	void setNewConnectionCallback(const NewConnectionCallback& cb)
-	{ newConnectionCallback_ = cb; }
+    void setNewConnectionCallback(const NewConnectionCallback& cb)
+    { newConnectionCallback_ = cb; }
 
-	void setErrorCallback(const ErrorCallback& cb)
-	{ errorCallback_ = cb; }
+    void setErrorCallback(const ErrorCallback& cb)
+    { errorCallback_ = cb; }
 
 private:
-	void handleWrtie();
+    void handleWrtie();
 
-	EventLoop* loop_;
-	InetAddress peer_;
-	int sockfd_;
-	bool started_;
-	Channel channel_;
-	NewConnectionCallback newConnectionCallback_;
-	ErrorCallback errorCallback_;
+    EventLoop* loop_;
+    InetAddress peer_;
+    int sockfd_;
+    bool started_;
+    Channel channel_;
+    NewConnectionCallback newConnectionCallback_;
+    ErrorCallback errorCallback_;
 };
 
 }

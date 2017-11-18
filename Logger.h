@@ -24,15 +24,15 @@ void setLogFd(int fd);
 
 /* private, do not use  */
 void log_base(const char *file,
-			  int line,
-			  int level,
-			  int to_abort,
-			  const char *fmt, ...);
+              int line,
+              int level,
+              int to_abort,
+              const char *fmt, ...);
 
 void log_sys(const char *file,
-			 int line,
-			 int to_abort,
-			 const char *fmt, ...);
+             int line,
+             int to_abort,
+             const char *fmt, ...);
 
 /* private, do not use  */
 #define LOG_BASE(level, to_abort, fmt, ...) \

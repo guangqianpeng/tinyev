@@ -16,9 +16,12 @@ int main()
     loop.runEvery(1s, [](){
        INFO("run every 500ms");
     });
-    loop.runAfter(1min, [&](){
+    loop.runAfter(24h, [&](){
         INFO("end after 1min");
         loop.quit();
+    });
+    loop.runAt(Clock::nowAfter(15min), [&](){
+        INFO("run 15min later");
     });
     INFO("start loop");
     loop.loop();

@@ -30,8 +30,8 @@ typedef std::function<void(const TcpConnectionPtr&, Buffer&)> MessageCallback;
 
 typedef std::function<void()> ErrorCallback;
 typedef std::function<void(int sockfd,
-						   const InetAddress& local,
-						   const InetAddress& peer)> NewConnectionCallback;
+                           const InetAddress& local,
+                           const InetAddress& peer)> NewConnectionCallback;
 
 typedef std::function<void()> Task;
 typedef std::function<void(size_t index)> ThreadInitCallback;
