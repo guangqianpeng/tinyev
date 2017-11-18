@@ -9,6 +9,7 @@
 #include <vector>
 #include <sys/types.h>
 
+#include "Timer.h"
 #include "EPoller.h"
 #include "TimerQueue.h"
 
@@ -28,9 +29,10 @@ public:
 	void runInLoop(const Task& task);
 	void queueInLoop(const Task& task);
 
-	void runAt(Timestamp when, TimerCallback callback);
-    void runAfter(Nanoseconds interval, TimerCallback callback);
-    void runEvery(Nanoseconds interval, TimerCallback callback);
+	Timer* runAt(Timestamp when, TimerCallback callback);
+    Timer* runAfter(Nanosecond interval, TimerCallback callback);
+    Timer* runEvery(Nanosecond interval, TimerCallback callback);
+    void cancelTimer(Timer* timer);
 
 	void wakeup();
 

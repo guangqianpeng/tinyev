@@ -104,23 +104,28 @@ void EventLoop::queueInLoop(const Task& task)
 		wakeup();
 }
 
-void EventLoop::runAt(Timestamp when, TimerCallback callback)
+Timer* EventLoop::runAt(Timestamp when, TimerCallback callback)
 {
-    timerQueue_.addTimer(std::move(callback), when, Millisecond::zero());
+    return timerQueue_.addTimer(std::move(callback), when, Millisecond::zero());
 }
 
-void EventLoop::runAfter(Nanoseconds interval, TimerCallback callback)
+Timer* EventLoop::runAfter(Nanosecond interval, TimerCallback callback)
 {
-    runAt(Clock::now() + interval, std::move(callback));
+    return runAt(Clock::now() + interval, std::move(callback));
 }
 
-
-void EventLoop::runEvery(Nanoseconds interval, TimerCallback callback)
+Timer* EventLoop::runEvery(Nanosecond interval, TimerCallback callback)
 {
-    timerQueue_.addTimer(std::move(callback),
-                         Clock::now() + interval,
-                         interval);
+    return timerQueue_.addTimer(std::move(callback),
+                                Clock::now() + interval,
+                                interval);
 }
+
+void EventLoop::cancelTimer(Timer* timer)
+{
+    timerQueue_.cancelTimer(timer);
+}
+
 
 void EventLoop::wakeup()
 {
