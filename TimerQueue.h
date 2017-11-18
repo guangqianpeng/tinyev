@@ -21,7 +21,8 @@ public:
     TimerQueue(EventLoop* loop);
     ~TimerQueue();
 
-    void addTimer(TimerCallback cb, Timestamp when, Nanoseconds interval);
+    Timer* addTimer(TimerCallback cb, Timestamp when, Nanosecond interval);
+    void cancelTimer(Timer* timer);
 
 private:
     typedef std::pair<Timestamp, Timer*> Entry;

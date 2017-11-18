@@ -33,7 +33,7 @@ void timerfdRead(int fd)
 struct timespec durationFromNow(Timestamp when)
 {
     struct timespec ret;
-    Nanoseconds ns = when - Clock::now();
+    Nanosecond ns = when - Clock::now();
     if (ns < 1ms) ns = 1ms;
 
     ret.tv_sec = static_cast<time_t>(ns.count() / std::nano::den);
@@ -73,7 +73,7 @@ TimerQueue::~TimerQueue()
 }
 
 
-void TimerQueue::addTimer(TimerCallback cb, Timestamp when, Nanoseconds interval)
+Timer* TimerQueue::addTimer(TimerCallback cb, Timestamp when, Nanosecond interval)
 {
     Timer* timer = new Timer(std::move(cb), when, interval);
     loop_->runInLoop([=](){
@@ -82,6 +82,16 @@ void TimerQueue::addTimer(TimerCallback cb, Timestamp when, Nanoseconds interval
 
         if (timers_.begin() == ret.first)
             timerfdSet(timerfd_, when);
+    });
+    return timer;
+}
+
+void TimerQueue::cancelTimer(Timer* timer)
+{
+    loop_->runInLoop([timer, this](){
+        timer->cancel();
+        timers_.erase({timer->when(), timer});
+        delete timer;
     });
 }
 
@@ -94,8 +104,9 @@ void TimerQueue::handleRead()
         Timer* timer = e.second;
         assert(timer->expired(now));
 
-        timer->run();
-        if (timer->repeat()) {
+        if (!timer->canceled())
+            timer->run();
+        if (!timer->canceled() && timer->repeat()) {
             timer->restart();
             e.first = timer->when();
             timers_.insert(e);
@@ -110,11 +121,10 @@ void TimerQueue::handleRead()
 
 std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
 {
-    Entry en(now + 1ms, nullptr);
+    Entry en(now + 1ns, nullptr);
     std::vector<Entry> entries;
 
     auto end = timers_.lower_bound(en);
-    assert(end != timers_.begin());
     entries.assign(timers_.begin(), end);
     timers_.erase(timers_.begin(), end);
 

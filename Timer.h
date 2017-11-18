@@ -17,15 +17,16 @@ namespace tinyev
 class Timer: noncopyable
 {
 public:
-    Timer(TimerCallback callback, Timestamp when, Nanoseconds interval)
+    Timer(TimerCallback callback, Timestamp when, Nanosecond interval)
             : callback_(std::move(callback)),
               when_(when),
               interval_(interval),
-              repeat_(interval_ > Nanoseconds::zero())
+              repeat_(interval_ > Nanosecond::zero()),
+              canceled_(false)
     {
     }
 
-    void run() { callback_(); }
+    void run() { if (callback_) callback_(); }
     bool repeat() const { return repeat_; }
     bool expired(Timestamp now) const { return now >= when_; }
     Timestamp when() const { return when_; }
@@ -34,12 +35,19 @@ public:
         assert(repeat_);
         when_ += interval_;
     }
+    void cancel()
+    {
+        assert(!canceled_);
+        canceled_ = true;
+    }
+    bool canceled() const { return canceled_; }
 
 private:
     TimerCallback callback_;
     Timestamp when_;
-    Nanoseconds interval_;
-    const bool repeat_;
+    const Nanosecond interval_;
+    bool repeat_;
+    bool canceled_;
 };
 
 }
