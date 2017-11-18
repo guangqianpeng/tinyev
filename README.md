@@ -27,23 +27,22 @@ tinyev是仿照muduo实现的一个基于Reactor模式的多线程C++网络库�
 class EchoServer
 {
 public:
-	EchoServer(EventLoop* loop, const InetAddress& addr)
-			: loop_(loop),
-			  server_(loop, addr),
-	{
-        // set echo callback
-		server_.setMessageCallback(std::bind(
-				&EchoServer::onMessage, this, _1, _2));
-	}
-	void start() { server_.start(); }
-	void onMessage(const TcpConnectionPtr& conn, Buffer& buffer)
-	{
-        // echo message
-		conn->send(buffer);
-	}
+  EchoServer(EventLoop* loop, const InetAddress& addr)
+    : loop_(loop),
+      server_(loop, addr),
+  {
+    // set echo callback
+    server_.setMessageCallback(std::bind(&EchoServer::onMessage, this, _1, _2));
+  }
+  void start() { server_.start(); }
+  void onMessage(const TcpConnectionPtr& conn, Buffer& buffer)
+  {
+    // echo message
+    conn->send(buffer);
+  }
 private:
-	EventLoop* loop_;
-	TcpServer server_;
+  EventLoop* loop_;
+  TcpServer server_;
 };
 ```
 
@@ -53,27 +52,26 @@ private:
 class EchoServer
 {
 public:
-    ...
-    void onConnection(const TcpConnectionPtr& conn)
-	{
-		if (conn->connected())
-            conn->setHighWaterMarkCallback(
-                    std::bind(&EchoServer::onHighWaterMark, this, _1, _2),
-                    1024);
-	}
-	void onHighWaterMark(const TcpConnectionPtr& conn, size_t mark)
-	{
-		INFO("high water mark %lu bytes, stop read", mark);
-        conn->stopRead();
-	}
-	void onWriteComplete(const TcpConnectionPtr& conn)
-	{
-		if (!conn->isReading()) {
-			INFO("write complete, start read");
-			conn->startRead();
-        }
-	}
-    ...
+  ...
+  void onConnection(const TcpConnectionPtr& conn)
+  {
+    if (conn->connected())
+      conn->setHighWaterMarkCallback(
+            std::bind(&EchoServer::onHighWaterMark, this, _1, _2), 1024);
+  }
+  void onHighWaterMark(const TcpConnectionPtr& conn, size_t mark)
+  {
+    INFO("high water mark %lu bytes, stop read", mark);
+    conn->stopRead();
+  }
+  void onWriteComplete(const TcpConnectionPtr& conn)
+  {
+    if (!conn->isReading()) {
+      INFO("write complete, start read");
+      conn->startRead();
+    }
+  }
+  ...
 };
 ```
 
@@ -86,9 +84,9 @@ public:
 ```c++
 EchoServer：：void start()
 {
-    // set thread num here
-    server_.setNumThread(2);
-    server_.start();
+  // set thread num here
+  server_.setNumThread(2);
+  server_.start();
 }
 ```
 
@@ -97,20 +95,20 @@ EchoServer：：void start()
 ```c++
 int main()
 {
-	EventLoop loop;
-    // listen address localhost:9877
-	InetAddress addr(9877);
-    // echo server with 4 threads and timeout of 10 seconds
-	EchoServer server(&loop, addr, 4, 10s);
-    // loop all other the threads except this one
-	server.start();
-    // quit after 1 minute
-	loop.runAfter(1min, [&](){ loop.quit(); });
-    // loop main thread
-	loop.loop();
+  EventLoop loop;
+  // listen address localhost:9877
+  InetAddress addr(9877);
+  // echo server with 4 threads and timeout of 10 seconds
+  EchoServer server(&loop, addr, 4, 10s);
+  // loop all other the threads except this one
+  server.start();
+  // quit after 1 minute
+  loop.runAfter(1min, [&](){ loop.quit(); });
+  // loop main thread
+  loop.loop();
 }
 ```
 
 ## 更多
 
-具体实现方法参考我的[博客](http://www.penggq.org/2017/09/%E5%A4%9A%E6%9C%BA%E5%B9%B6%E8%A1%8C%E6%B1%82%E8%A7%A3N%E7%9A%87%E5%90%8E%E9%97%AE%E9%A2%98)。
+网络库的具体实现方法参考我的[博客](http://www.penggq.org/2017/09/%E5%A4%9A%E6%9C%BA%E5%B9%B6%E8%A1%8C%E6%B1%82%E8%A7%A3N%E7%9A%87%E5%90%8E%E9%97%AE%E9%A2%98)。
