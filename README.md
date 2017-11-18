@@ -77,7 +77,7 @@ public:
 
 我们新增了3个函调函数：`onConnection`，`onHighWaterMark`和`onWriteComplete`。当TCP连接建立时`onConnection`会设置高水位回调值（high water mark）；当send buffer达到值时该设定值时，`onHighWaterMark`会停止读socket；当send buffer全部写入内核时，`onWriteComplete`会重新开始读socket。
 
-除此以外，我们还需要给服务器加上定时功能以清除空闲连接。实现思路是让服务器保存一个TCP连接的`std::map`，每隔5s扫描一遍所有连接并清除超时的连接，代码在[这里](./trival/echo.cc)。
+除此以外，我们还需要给服务器加上定时功能以清除空闲连接。实现思路是让服务器保存一个TCP连接的`std::map`，每隔5s扫描一遍所有连接并清除超时的连接，代码在[这里](./trivial/echo.cc)。
 
 然后，我们给服务器加上多线程功能。实现起来非常简单，只需加一行代码即可：
 
@@ -111,4 +111,4 @@ int main()
 
 ## 更多
 
-网络库的具体实现方法参考我的[博客](http://www.penggq.org/2017/09/%E5%A4%9A%E6%9C%BA%E5%B9%B6%E8%A1%8C%E6%B1%82%E8%A7%A3N%E7%9A%87%E5%90%8E%E9%97%AE%E9%A2%98)。
+网络库的具体实现方法参考我的[博客](http://www.penggq.org/2017/09/%E5%86%99%E4%B8%80%E4%B8%AAC-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BD%91%E7%BB%9C%E5%BA%93)。
