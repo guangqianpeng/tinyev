@@ -8,7 +8,7 @@ tinyev是仿照muduo实现的一个基于Reactor模式的多线程C++网络库�
 
   ```c++
   using namespace std::literals::chrono_literals;
-  loop.runEvery(500s, [](){INFO("run every 500ms");});
+  loop.runEvery(10s, [](){INFO("run every 10s");});
   loop.runAfter(24h, [&](){INFO("end after 24h");});
   loop.runAt(Clock::nowAfter(15min), [](){INFO("run 15min later");});
   ```
