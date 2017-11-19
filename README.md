@@ -75,9 +75,9 @@ public:
 };
 ```
 
-我们新增了3个函调函数：`onConnection`，`onHighWaterMark`和`onWriteComplete`。当TCP连接建立时`onConnection`会设置高水位回调值（high water mark）；当send buffer达到值时该设定值时，`onHighWaterMark`会停止读socket；当send buffer全部写入内核时，`onWriteComplete`会重新开始读socket。
+我们新增了3个回调：`onConnection`，`onHighWaterMark`和`onWriteComplete`。当TCP连接建立时`onConnection`会设置高水位回调值（high water mark）；当send buffer达到该值时，`onHighWaterMark`会停止读socket；当send buffer全部写入内核时，`onWriteComplete`会重新开始读socket。
 
-除此以外，我们还需要给服务器加上定时功能以清除空闲连接。实现思路是让服务器保存一个TCP连接的`std::map`，每隔5s扫描一遍所有连接并清除超时的连接，代码在[这里](./trivial/echo.cc)。
+除此以外，我们还需要给服务器加上定时功能以清除空闲连接。实现思路是让服务器保存一个TCP连接的`std::map`，每隔几秒扫描一遍所有连接并清除超时的连接，代码在[这里](./trivial/echo.cc)。
 
 然后，我们给服务器加上多线程功能。实现起来非常简单，只需加一行代码即可：
 
