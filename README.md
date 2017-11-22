@@ -1,10 +1,10 @@
 # tinyev: A multithreaded C++ network library
 
-tinyev是仿照muduo实现的一个基于Reactor模式的多线程C++网络库，经过适当简化以后代码量约为2000行。简化的部分如下：
+tinyev是仿照muduo[1]实现的一个基于Reactor模式的多线程C++网络库，经过适当简化以后代码量约为2000行。简化的部分如下：
 
 - 多线程依赖于C++11提供的std::thread库，而不是重新封装POSIX thread API。
 
-- 定时器依赖于C++11提供的std::chrono库，而不是自己实现Timstamp类，也不用直接调用`gettimeofday()`。这样写的好处之一是我们不必再为定时器API的时间单位操心：
+- 定时器依赖于C++11提供的std::chrono库，而不是自己实现Timstamp类，也不用直接调用`gettimeofday()`。这样写的好处之一是我们不必再为定时器API的时间单位操心[2]：
 
   ```c++
   using namespace std::literals::chrono_literals;
@@ -112,3 +112,9 @@ int main()
 ## 更多
 
 网络库的具体实现方法参考我的[博客](http://www.penggq.org/2017/09/%E5%86%99%E4%B8%80%E4%B8%AAC-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BD%91%E7%BB%9C%E5%BA%93)。
+
+## 参考
+
+[[1]](https://github.com/chenshuo/muduo) Muduo is a multithreaded C++ network library based onthe reactor pattern.
+
+[[2]](https://www.youtube.com/watch?v=fX2W3nNjJIo&list=PLHTh1InhhwT6bwIpRk0ZbCA0N2p1taxd6) CppCon 2017: Bjarne Stroustrup “Learning and Teaching Modern C++”. Make interfaces precisely and strongly typed.
