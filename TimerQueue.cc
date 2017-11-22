@@ -27,7 +27,8 @@ void timerfdRead(int fd)
 {
     uint64_t val;
     ssize_t n = read(fd, &val, sizeof(val));
-    assert(n > 0); (void)n;
+    if (n != sizeof(val))
+        ERROR("timerfdRead get %ld, not %lu", n, sizeof(val));
 }
 
 struct timespec durationFromNow(Timestamp when)
@@ -98,6 +99,7 @@ void TimerQueue::cancelTimer(Timer* timer)
 void TimerQueue::handleRead()
 {
     loop_->assertInLoopThread();
+    timerfdRead(timerfd_);
 
     Timestamp now(Clock::now());
     for (auto& e: getExpired(now)) {
@@ -114,7 +116,6 @@ void TimerQueue::handleRead()
         else delete timer;
     }
 
-    timerfdRead(timerfd_);
     if (!timers_.empty())
         timerfdSet(timerfd_, timers_.begin()->first);
 }

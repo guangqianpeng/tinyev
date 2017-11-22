@@ -114,9 +114,18 @@ int main()
     setLogLevel(LOG_LEVEL_TRACE);
     EventLoop loop;
     InetAddress addr(9877);
-    EchoServer server(&loop, addr, std::thread::hardware_concurrency(), 10s);
+    EchoServer server(&loop, addr, 1, 5s);
     server.start();
 
-    loop.runAfter(1min, [&](){ loop.quit(); });
+    loop.runAfter(1min, [&](){
+        int countdown = 5;
+        INFO("server quit after %d second...", countdown);
+        loop.runEvery(1s, [&, countdown]() mutable {
+            INFO("server quit after %d second...", --countdown);
+            if (countdown == 0)
+                loop.quit();
+        });
+    });
+
     loop.loop();
 }
