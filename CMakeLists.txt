@@ -23,7 +23,7 @@ set(CXX_FLAGS
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
 set(CMAKE_CXX_COMPILER "g++")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -finline-limit=1000 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -finline-limit=1000 -DNDEBUG")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
@@ -54,7 +54,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_subdirectory(kth_element)
 add_subdirectory(nqueen)
 add_subdirectory(sort)
-add_subdirectory(trivial)
+add_subdirectory(example)
 
 add_library(tinyev STATIC ${SOURCE_FILES})
 target_link_libraries(tinyev pthread)

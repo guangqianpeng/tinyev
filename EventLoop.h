@@ -5,6 +5,7 @@
 #ifndef TINYEV_EVENTLOOP_H
 #define TINYEV_EVENTLOOP_H
 
+#include <atomic>
 #include <mutex>
 #include <vector>
 #include <sys/types.h>

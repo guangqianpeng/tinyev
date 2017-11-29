@@ -8,9 +8,9 @@ tinyev是仿照muduo[1]实现的一个基于Reactor模式的多线程C++网络�
 
   ```c++
   using namespace std::literals::chrono_literals;
-  loop.runEvery(10s, [](){INFO("run every 10s");});
-  loop.runAfter(24h, [&](){INFO("end after 24h");});
-  loop.runAt(Clock::nowAfter(15min), [](){INFO("run 15min later");});
+  loop.runEvery(10s, [](){INFO("run every 10 seconds");});
+  loop.runAfter(24h, [](){INFO("run after 24 hours");});
+  loop.runAt(Clock::nowAfter(15min), [](){INFO("run 15 minutes later");});
   ```
 
 - 默认为accept socket开启SO_RESUEPORT选项，这样每个线程都有自己的Acceptor，就不必在线程间传递connection socket。开启该选项后内核会将TCP连接分摊给各个线程，因此不必担心负载均衡的问题。
@@ -46,7 +46,7 @@ private:
 };
 ```
 
-这个实现非常简单，读者只需关注`onMessage`回调函数，它将收到消息发回客户端。然而，该实现有一个问题：若客户端只发送而不接收数据（即只调用`write`而不调用`send`），则TCP的流量控制（flow control）会导致数据堆积在服务端，最终会耗尽服务端内存。为解决该问题我们引入高/低水位回调：
+这个实现非常简单，读者只需关注`onMessage`回调函数，它将收到消息发回客户端。然而，该实现有一个问题：若客户端只发送而不接收数据（即只调用`write`而不调用`read`），则TCP的流量控制（flow control）会导致数据堆积在服务端，最终会耗尽服务端内存。为解决该问题我们引入高/低水位回调：
 
 ```c++
 class EchoServer
@@ -77,7 +77,7 @@ public:
 
 我们新增了3个回调：`onConnection`，`onHighWaterMark`和`onWriteComplete`。当TCP连接建立时`onConnection`会设置高水位回调值（high water mark）；当send buffer达到该值时，`onHighWaterMark`会停止读socket；当send buffer全部写入内核时，`onWriteComplete`会重新开始读socket。
 
-除此以外，我们还需要给服务器加上定时功能以清除空闲连接。实现思路是让服务器保存一个TCP连接的`std::map`，每隔几秒扫描一遍所有连接并清除超时的连接，代码在[这里](./trivial/echo.cc)。
+除此以外，我们还需要给服务器加上定时功能以清除空闲连接。实现思路是让服务器保存一个TCP连接的`std::map`，每隔几秒扫描一遍所有连接并清除超时的连接，代码在[这里](./example/echo.cc)。
 
 然后，我们给服务器加上多线程功能。实现起来非常简单，只需加一行代码即可：
 

@@ -68,6 +68,7 @@ void EventLoop::loop()
 {
     assertInLoopThread();
     TRACE("EventLoop %p polling", this);
+    quit_ = false;
     while (!quit_) {
         activeChannels_.clear();
         poller_.poll(activeChannels_);
