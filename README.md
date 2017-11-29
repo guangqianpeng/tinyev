@@ -24,7 +24,7 @@ tinyev是仿照muduo[1]实现的一个基于Reactor模式的多线程C++网络�
 一个简单的echo服务器如下：
 
 ```C++
-class EchoServer
+class EchoServer: noncopyable
 {
 public:
   EchoServer(EventLoop* loop, const InetAddress& addr)
@@ -49,7 +49,7 @@ private:
 这个实现非常简单，读者只需关注`onMessage`回调函数，它将收到消息发回客户端。然而，该实现有一个问题：若客户端只发送而不接收数据（即只调用`write`而不调用`read`），则TCP的流量控制（flow control）会导致数据堆积在服务端，最终会耗尽服务端内存。为解决该问题我们引入高/低水位回调：
 
 ```c++
-class EchoServer
+class EchoServer: noncopyable
 {
 public:
   ...
@@ -100,7 +100,7 @@ int main()
   InetAddress addr(9877);
   // echo server with 4 threads and timeout of 10 seconds
   EchoServer server(&loop, addr, 4, 10s);
-  // loop all other the threads except this one
+  // loop all other threads except this one
   server.start();
   // quit after 1 minute
   loop.runAfter(1min, [&](){ loop.quit(); });
@@ -115,6 +115,6 @@ int main()
 
 ## 参考
 
-[[1]](https://github.com/chenshuo/muduo) Muduo is a multithreaded C++ network library based onthe reactor pattern.
+[[1]](https://github.com/chenshuo/muduo) Muduo is a multithreaded C++ network library based on the reactor pattern.
 
 [[2]](https://www.youtube.com/watch?v=fX2W3nNjJIo&list=PLHTh1InhhwT6bwIpRk0ZbCA0N2p1taxd6) CppCon 2017: Bjarne Stroustrup “Learning and Teaching Modern C++”. Make interfaces precisely and strongly typed.
