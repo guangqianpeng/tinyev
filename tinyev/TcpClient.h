@@ -7,6 +7,7 @@
 
 #include <tinyev/Callbacks.h>
 #include <tinyev/Connector.h>
+#include <tinyev/Timer.h>
 
 namespace tinyev
 {
@@ -17,6 +18,7 @@ public:
     TcpClient(EventLoop* loop, const InetAddress& peer);
     ~TcpClient();
 
+    void start();
     void setConnectionCallback(const ConnectionCallback& cb)
     { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb)
@@ -24,15 +26,21 @@ public:
     void setWriteCompleteCallback(const WriteCompleteCallback& cb)
     { writeCompleteCallback_ = cb; }
     void setErrorCallback(const ErrorCallback& cb)
-    { connector_.setErrorCallback(cb); }
-    void start() { connector_.start(); }
+    { connector_->setErrorCallback(cb); }
 
 private:
+    void retry();
     void newConnection(int connfd, const InetAddress& local, const InetAddress& peer);
     void closeConnection(const TcpConnectionPtr& conn);
 
+private:
+    typedef std::unique_ptr<Connector> ConnectorPtr;
+
     EventLoop* loop_;
-    Connector connector_;
+    bool connected_;
+    const InetAddress peer_;
+    Timer* retryTimer_;
+    ConnectorPtr connector_;
     TcpConnectionPtr connection_;
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;

@@ -2,6 +2,7 @@
 // Created by frank on 17-9-4.
 //
 
+#include <tinyev/Logger.h>
 #include <tinyev/EventLoop.h>
 #include <tinyev/TcpConnection.h>
 #include <tinyev/TcpClient.h>
@@ -10,11 +11,14 @@ using namespace tinyev;
 
 TcpClient::TcpClient(EventLoop* loop, const InetAddress& peer)
         : loop_(loop),
-          connector_(loop, peer),
+          connected_(false),
+          peer_(peer),
+          retryTimer_(nullptr),
+          connector_(new Connector(loop, peer)),
           connectionCallback_(defaultConnectionCallback),
           messageCallback_(defaultMessageCallback)
 {
-    connector_.setNewConnectionCallback(std::bind(
+    connector_->setNewConnectionCallback(std::bind(
             &TcpClient::newConnection, this, _1, _2, _3));
 }
 
@@ -24,9 +28,32 @@ TcpClient::~TcpClient()
         connection_->forceClose();
 }
 
+void TcpClient::start()
+{
+    loop_->assertInLoopThread();
+    connector_->start();
+    retryTimer_ = loop_->runEvery(3s, [this](){ retry(); });
+}
+
+void TcpClient::retry()
+{
+    loop_->assertInLoopThread();
+    if (connected_) {
+        return;
+    }
+
+    WARN("TcpClient::retry() reconnect %s...", peer_.toIpPort().c_str());
+    connector_ = std::make_unique<Connector>(loop_, peer_);
+    connector_->setNewConnectionCallback(std::bind(
+            &TcpClient::newConnection, this, _1, _2, _3));
+    connector_->start();
+}
+
 void TcpClient::newConnection(int connfd, const InetAddress& local, const InetAddress& peer)
 {
     loop_->assertInLoopThread();
+    loop_->cancelTimer(retryTimer_);
+    connected_ = true;
     auto conn = std::make_shared<TcpConnection>
             (loop_, connfd, local, peer);
     connection_ = conn;

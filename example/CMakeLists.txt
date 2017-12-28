@@ -1,11 +1,14 @@
-add_executable(echo echo.cc)
-target_link_libraries(echo tinyev)
+add_executable(echo_server EchoServer.cc)
+target_link_libraries(echo_server tinyev)
 
-add_executable(discard discard.cc)
-target_link_libraries(discard tinyev)
+add_executable(echo_client EchoClient.cc)
+target_link_libraries(echo_client tinyev)
 
-add_executable(chargen chargen.cc ../kth_element/Codec.cc ../kth_element/Codec.h)
-target_link_libraries(chargen tinyev)
+add_executable(discard_server DiscardServer.cc)
+target_link_libraries(discard_server tinyev)
+
+add_executable(chargen_server ChargenServer.cc)
+target_link_libraries(chargen_server tinyev)
 
 add_executable(timer timer.cc)
 target_link_libraries(timer tinyev)

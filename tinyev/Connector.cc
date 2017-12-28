@@ -16,7 +16,7 @@ using namespace tinyev;
 namespace
 {
 
-// fixme same code in Acceptor
+// fixme: duplicate code in Acceptor
 int createSocket()
 {
     int ret = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
@@ -31,6 +31,7 @@ Connector::Connector(EventLoop* loop, const InetAddress& peer)
         : loop_(loop),
           peer_(peer),
           sockfd_(createSocket()),
+          connected_(false),
           started_(false),
           channel_(loop, sockfd_)
 {
@@ -39,7 +40,8 @@ Connector::Connector(EventLoop* loop, const InetAddress& peer)
 
 Connector::~Connector()
 {
-    ::close(sockfd_);
+    if (!connected_)
+        ::close(sockfd_);
 }
 
 void Connector::start()
@@ -84,6 +86,9 @@ void Connector::handleWrtie()
             SYSERR("Connection::getsockname()");
         InetAddress local;
         local.setAddress(addr);
+
+        // now sockfd_ is not belong to us
+        connected_ = true;
         newConnectionCallback_(sockfd_, local, peer_);
     }
 }

@@ -35,8 +35,9 @@ private:
     void handleWrtie();
 
     EventLoop* loop_;
-    InetAddress peer_;
-    int sockfd_;
+    const InetAddress peer_;
+    const int sockfd_;
+    bool connected_;
     bool started_;
     Channel channel_;
     NewConnectionCallback newConnectionCallback_;
