@@ -4,8 +4,9 @@
 
 #include <sstream>
 
-#include "TcpConnection.h"
-#include "Logger.h"
+#include <tinyev/TcpConnection.h>
+#include <tinyev/Logger.h>
+
 #include "Codec.h"
 
 using namespace tinyev;

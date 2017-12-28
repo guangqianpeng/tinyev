@@ -6,12 +6,13 @@
 #include <unistd.h> //getpid
 #include <algorithm> // sort
 
-#include "Logger.h"
-#include "EventLoop.h"
-#include "TcpServer.h"
+#include <tinyev/Logger.h>
+#include <tinyev/EventLoop.h>
+#include <tinyev/TcpServer.h>
+#include <tinyev/TcpConnection.h>
+#include <tinyev/EventLoopThread.h>
+
 #include "Codec.h"
-#include "TcpConnection.h"
-#include "EventLoopThread.h"
 
 using namespace tinyev;
 

@@ -8,8 +8,8 @@
 #include <memory>
 #include <set>
 
-#include "Timer.h"
-#include "Channel.h"
+#include <tinyev/Timer.h>
+#include <tinyev/Channel.h>
 
 namespace tinyev
 {

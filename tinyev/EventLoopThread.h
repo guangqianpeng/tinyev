@@ -7,8 +7,7 @@
 
 #include <thread>
 
-#include "CountDownLatch.h"
-#include "noncopyable.h"
+#include <tinyev/CountDownLatch.h>
 
 namespace tinyev
 {

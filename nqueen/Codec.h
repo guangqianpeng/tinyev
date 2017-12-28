@@ -9,8 +9,8 @@
 #include <vector>
 #include <functional>
 
-#include "Callbacks.h"
-#include "noncopyable.h"
+#include <tinyev/Callbacks.h>
+#include <tinyev/noncopyable.h>
 
 struct Request
 {

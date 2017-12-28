@@ -4,8 +4,8 @@
 
 #include <cassert>
 
-#include "EventLoopThread.h"
-#include "EventLoop.h"
+#include <tinyev/EventLoopThread.h>
+#include <tinyev/EventLoop.h>
 
 using namespace tinyev;
 

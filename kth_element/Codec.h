@@ -8,8 +8,8 @@
 
 #include <functional>
 
-#include "Callbacks.h"
-#include "noncopyable.h"
+#include <tinyev/Callbacks.h>
+#include <tinyev/noncopyable.h>
 
 class Codec: tinyev::noncopyable
 {

@@ -7,9 +7,9 @@
 
 #include <functional>
 
-#include "InetAddress.h"
-#include "Channel.h"
-#include "noncopyable.h"
+#include <tinyev/InetAddress.h>
+#include <tinyev/Channel.h>
+#include <tinyev/noncopyable.h>
 
 namespace tinyev
 {

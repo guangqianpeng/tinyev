@@ -5,9 +5,9 @@
 #include <cassert>
 #include <unistd.h>
 
-#include "Logger.h"
-#include "EventLoop.h"
-#include "TcpConnection.h"
+#include <tinyev/Logger.h>
+#include <tinyev/EventLoop.h>
+#include <tinyev/TcpConnection.h>
 
 using namespace tinyev;
 

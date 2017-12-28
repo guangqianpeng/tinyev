@@ -4,8 +4,8 @@
 
 #include <cassert>
 
-#include "Logger.h"
-#include "ThreadPool.h"
+#include <tinyev/Logger.h>
+#include <tinyev/ThreadPool.h>
 
 using namespace tinyev;
 

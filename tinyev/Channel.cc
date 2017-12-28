@@ -4,8 +4,8 @@
 
 #include <cassert>
 
-#include "EventLoop.h"
-#include "Channel.h"
+#include <tinyev/EventLoop.h>
+#include <tinyev/Channel.h>
 
 using namespace tinyev;
 

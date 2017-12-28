@@ -4,8 +4,9 @@
 
 #include <sstream>
 
-#include "Logger.h"
-#include "TcpConnection.h"
+#include <tinyev/Logger.h>
+#include <tinyev/TcpConnection.h>
+
 #include "Codec.h"
 
 #define QUERY 	'@'

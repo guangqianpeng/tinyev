@@ -27,35 +27,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -finline-limit=1000 -DNDEBUG")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-set(SOURCE_FILES
-        EventLoop.cc EventLoop.h
-        EPoller.cc EPoller.h
-        Channel.cc Channel.h
-        Logger.h Logger.c
-        noncopyable.h
-        Acceptor.cc Acceptor.h
-        InetAddress.cc InetAddress.h
-        TcpConnection.cc TcpConnection.h
-        Callbacks.h
-        TcpServerSingle.cc TcpServerSingle.h
-        TcpServer.cc TcpServer.h
-        Buffer.h Buffer.cc
-        ThreadPool.cc ThreadPool.h
-        Connector.cc Connector.h
-        TcpClient.cc TcpClient.h
-        CountDownLatch.h
-        EventLoopThread.cc EventLoopThread.h
-        TimerQueue.cc TimerQueue.h
-        Timer.h
-        Timestamp.h)
-
 include_directories(${PROJECT_SOURCE_DIR})
 
+add_subdirectory(tinyev)
 add_subdirectory(kth_element)
 add_subdirectory(nqueen)
 add_subdirectory(sort)
 add_subdirectory(example)
-
-add_library(tinyev STATIC ${SOURCE_FILES})
-target_link_libraries(tinyev pthread)
-target_link_libraries(tinyev "/usr/lib64/libstdc++.so.6")

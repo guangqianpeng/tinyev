@@ -2,11 +2,11 @@
 // Created by frank on 17-9-1.
 //
 
-#include "Logger.h"
-#include "TcpConnection.h"
-#include "TcpServerSingle.h"
-#include "EventLoop.h"
-#include "TcpServer.h"
+#include <tinyev/Logger.h>
+#include <tinyev/TcpConnection.h>
+#include <tinyev/TcpServerSingle.h>
+#include <tinyev/EventLoop.h>
+#include <tinyev/TcpServer.h>
 
 using namespace tinyev;
 
@@ -47,7 +47,7 @@ void TcpServer::start()
     assert(!started_);
     started_ = true;
 
-    INFO("TcpServer::start() %s with %lu eventLoop threads",
+    INFO("TcpServer::start() %s with %lu eventLoop thread(s)",
          local_.toIpPort().c_str(), numThreads_);
 
     baseServer_ = std::make_unique<TcpServerSingle>(baseLoop_, local_);

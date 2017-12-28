@@ -11,8 +11,8 @@
 #include <vector>
 #include <deque>
 
-#include "noncopyable.h"
-#include "Callbacks.h"
+#include <tinyev/noncopyable.h>
+#include <tinyev/Callbacks.h>
 
 namespace tinyev
 {

@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include <ratio> // std::nano::den
 
-#include "Logger.h"
-#include "EventLoop.h"
-#include "TimerQueue.h"
+#include <tinyev/Logger.h>
+#include <tinyev/EventLoop.h>
+#include <tinyev/TimerQueue.h>
 
 using namespace tinyev;
 

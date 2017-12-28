@@ -7,9 +7,9 @@
 
 #include <cassert>
 
-#include "Callbacks.h"
-#include "Channel.h"
-#include "Timestamp.h"
+#include <tinyev/Callbacks.h>
+#include <tinyev/Channel.h>
+#include <tinyev/Timestamp.h>
 
 namespace tinyev
 {

@@ -5,8 +5,8 @@
 #ifndef TINYEV_TCPCLIENT_H
 #define TINYEV_TCPCLIENT_H
 
-#include "Callbacks.h"
-#include "Connector.h"
+#include <tinyev/Callbacks.h>
+#include <tinyev/Connector.h>
 
 namespace tinyev
 {

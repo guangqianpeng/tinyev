@@ -7,9 +7,8 @@
 
 #include <unordered_set>
 
-#include "Callbacks.h"
-#include "Acceptor.h"
-#include "noncopyable.h"
+#include <tinyev/Callbacks.h>
+#include <tinyev/Acceptor.h>
 
 namespace tinyev
 {

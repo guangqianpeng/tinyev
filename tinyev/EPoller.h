@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "noncopyable.h"
+#include <tinyev/noncopyable.h>
 
 namespace tinyev
 {
