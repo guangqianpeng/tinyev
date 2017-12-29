@@ -14,10 +14,10 @@ int main()
     EventLoop loop;
 
     loop.runEvery(1s, [](){
-       INFO("run every 500ms");
+       INFO("run every 1s");
     });
-    loop.runAfter(5s, [&](){
-        INFO("end after 1min");
+    loop.runAfter(10s, [&](){
+        INFO("end after 10s");
         loop.quit();
     });
     loop.runAt(Clock::nowAfter(15min), [&](){
