@@ -9,7 +9,6 @@ addons:
     sources:
     # add PPAs with more up-to-date toolchains
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-5.0
     packages:
     # install toolchains
     - g++-7

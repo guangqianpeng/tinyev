@@ -7,11 +7,13 @@
 
 #include <chrono>
 
+
 namespace tinyev
 {
 
 using std::chrono::system_clock;
-using namespace std::chrono_literals;
+using namespace std::literals::chrono_literals;
+
 
 typedef std::chrono::nanoseconds   Nanosecond;
 typedef std::chrono::microseconds  Microsecond;
