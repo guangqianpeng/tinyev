@@ -22,3 +22,28 @@ set(SOURCE_FILES
 
 add_library(tinyev STATIC ${SOURCE_FILES})
 target_link_libraries(tinyev pthread)
+
+install(TARGETS tinyev DESTINATION lib)
+set(HEADERS
+        Acceptor.h
+        Buffer.h
+        Callbacks.h
+        Channel.h
+        Connector.h
+        CountDownLatch.h
+        EPoller.h
+        EventLoop.h
+        EventLoopThread.h
+        InetAddress.h
+        Logger.h
+        noncopyable.h
+        TcpClient.h
+        TcpConnection.h
+        TcpServer.h
+        TcpServerSingle.h
+        ThreadPool.h
+        Timer.h
+        TimerQueue.h
+        Timestamp.h
+        )
+install(FILES ${HEADERS} DESTINATION include)

@@ -109,6 +109,17 @@ int main()
 }
 ```
 
+## 安装
+
+```shell
+$ git clone git@github.com:guangqianpeng/tinyev.git
+$ cd tinyev
+$ ./build.sh 
+see binary in ../tinyev-build/Release/{bin, lib}
+$ ./build.sh install
+see tinyev headers and library in ../tinyev-build/Release/{include, lib}
+```
+
 ## 更多
 
 网络库的具体实现方法参考我的[博客](http://www.penggq.org/2017/09/%E5%86%99%E4%B8%80%E4%B8%AAC-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BD%91%E7%BB%9C%E5%BA%93)。

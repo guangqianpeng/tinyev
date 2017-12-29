@@ -26,6 +26,9 @@ TcpClient::~TcpClient()
 {
     if (connection_ && !connection_->disconnected())
         connection_->forceClose();
+    if (retryTimer_ != nullptr) {
+        loop_->cancelTimer(retryTimer_);
+    }
 }
 
 void TcpClient::start()
