@@ -1,5 +1,9 @@
 # tinyev: A multithreaded C++ network library
 
+[![Build Status](https://travis-ci.org/guangqianpeng/tinyev.svg?branch=master)](https://travis-ci.org/guangqianpeng/tinyev)
+
+## 简介
+
 tinyev是仿照muduo[1]实现的一个基于Reactor模式的多线程C++网络库，经过适当简化以后代码量约为2000行。简化的部分如下：
 
 - 多线程依赖于C++11提供的std::thread库，而不是重新封装POSIX thread API。
