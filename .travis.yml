@@ -1,4 +1,5 @@
 language: cpp
+sudo: required
 dist: trusty
 compiler:
   - gcc
@@ -19,3 +20,6 @@ script:
   - g++-7 -v
   - grep CXX_COMPILER CMakeLists.txt
   - ./build.sh
+
+notifications:
+  email: never

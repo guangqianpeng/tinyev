@@ -6,7 +6,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CXX_FLAGS
-        -std=c++17
         -Wall
         -Wextra
         -Werror
@@ -18,6 +17,7 @@ set(CXX_FLAGS
         -Wshadow
         -Wwrite-strings
         -march=native
+        -std=c++17
         -rdynamic)
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
