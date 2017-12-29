@@ -24,3 +24,5 @@ script:
   - g++ -v
   - grep CXX_COMPILER CMakeLists.txt
   - ./build.sh install
+notifications:
+  email: never
