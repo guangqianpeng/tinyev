@@ -17,6 +17,7 @@ env:
   - BUILD_TYPE=Debug
   - BUILD_TYPE=Release
 script:
+  - CC=gcc-7 && CXX=g++-7
   - g++-7 -v
   - grep CXX_COMPILER CMakeLists.txt
   - ./build.sh
