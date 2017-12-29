@@ -135,7 +135,14 @@ public:
     }
 
     void append(const std::string &data)
-    { append(data.c_str(), data.length()); }
+    {
+        append(data.c_str(), data.length());
+    }
+
+    void append(std::string_view data)
+    {
+        append(data.begin(), data.length());
+    }
 
     void append(const char *data, size_t len)
     {
