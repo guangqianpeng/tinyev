@@ -154,22 +154,6 @@ void TcpConnection::sendInLoop(const char *data, size_t len)
     }
 }
 
-void TcpConnection::send(const std::string& message)
-{
-    if (state_ != kConnected) {
-        WARN("TcpConnection::send() not connected, give up send");
-        return;
-    }
-    if (loop_->isInLoopThread()) {
-        sendInLoop(message);
-    }
-    else {
-        loop_->queueInLoop(
-                [ptr = shared_from_this(), str = message]()
-                { ptr->sendInLoop(str); });
-    }
-}
-
 void TcpConnection::sendInLoop(const std::string& message)
 {
     sendInLoop(message.data(), message.size());

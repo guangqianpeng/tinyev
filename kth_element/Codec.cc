@@ -43,7 +43,7 @@ size_t parseInt128(const std::string& arg, __int128& ret)
 void defaultParseErrorCallback(const TcpConnectionPtr& conn)
 {
 	WARN("%s parse error, forceClose", conn->name().c_str());
-	conn->send("bad message\r\n");
+	conn->send("bad message\r\n"sv);
 	conn->forceClose();
 }
 

@@ -62,7 +62,6 @@ public:
     // I/O operations are thread safe
     void send(std::string_view data);
     void send(const char* data, size_t len);
-    void send(const std::string& message);
     void send(Buffer& buffer);
     void shutdown();
     void forceClose();

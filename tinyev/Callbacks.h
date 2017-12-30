@@ -10,6 +10,7 @@
 
 namespace tinyev
 {
+using namespace std::string_view_literals;
 
 using std::placeholders::_1;
 using std::placeholders::_2;
