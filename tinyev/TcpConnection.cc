@@ -87,6 +87,11 @@ bool TcpConnection::connected() const
 bool TcpConnection::disconnected() const
 { return state_ == kDisconnected; }
 
+void TcpConnection::send(std::string_view data)
+{
+    send(data.data(), data.length());
+}
+
 void TcpConnection::send(const char *data, size_t len)
 {
     if (state_ != kConnected) {
