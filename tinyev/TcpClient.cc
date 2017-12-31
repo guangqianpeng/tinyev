@@ -56,6 +56,7 @@ void TcpClient::newConnection(int connfd, const InetAddress& local, const InetAd
 {
     loop_->assertInLoopThread();
     loop_->cancelTimer(retryTimer_);
+    retryTimer_ = nullptr; // avoid duplicate cancel
     connected_ = true;
     auto conn = std::make_shared<TcpConnection>
             (loop_, connfd, local, peer);
