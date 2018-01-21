@@ -10,7 +10,7 @@
 
 #include <tinyev/noncopyable.h>
 
-namespace tinyev
+namespace ev
 {
 
 class CountDownLatch: noncopyable

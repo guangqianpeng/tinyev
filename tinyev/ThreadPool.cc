@@ -7,7 +7,7 @@
 #include <tinyev/Logger.h>
 #include <tinyev/ThreadPool.h>
 
-using namespace tinyev;
+using namespace ev;
 
 ThreadPool::ThreadPool(size_t numThread, size_t maxQueueSize, const ThreadInitCallback& cb)
         : maxQueueSize_(maxQueueSize),

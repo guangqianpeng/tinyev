@@ -10,7 +10,7 @@
 #include <tinyev/InetAddress.h>
 #include <tinyev/Acceptor.h>
 
-using namespace tinyev;
+using namespace ev;
 
 namespace
 {

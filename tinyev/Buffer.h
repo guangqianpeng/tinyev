@@ -23,7 +23,7 @@
 #include <cassert>
 #include <cstring>
 
-namespace tinyev
+namespace ev
 {
 
 class Buffer

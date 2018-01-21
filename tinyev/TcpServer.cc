@@ -8,7 +8,7 @@
 #include <tinyev/EventLoop.h>
 #include <tinyev/TcpServer.h>
 
-using namespace tinyev;
+using namespace ev;
 
 TcpServer::TcpServer(EventLoop* loop, const InetAddress& local)
         : baseLoop_(loop),

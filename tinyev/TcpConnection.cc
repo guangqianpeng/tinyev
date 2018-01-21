@@ -9,9 +9,9 @@
 #include <tinyev/EventLoop.h>
 #include <tinyev/TcpConnection.h>
 
-using namespace tinyev;
+using namespace ev;
 
-namespace tinyev
+namespace ev
 {
 
 enum ConnectionState

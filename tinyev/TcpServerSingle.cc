@@ -8,7 +8,7 @@
 #include "Buffer.h"
 #include "TcpServerSingle.h"
 
-using namespace tinyev;
+using namespace ev;
 
 TcpServerSingle::TcpServerSingle(EventLoop* loop, const InetAddress& local)
         : loop_(loop),

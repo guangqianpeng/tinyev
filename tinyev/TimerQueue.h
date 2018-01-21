@@ -11,7 +11,7 @@
 #include <tinyev/Timer.h>
 #include <tinyev/Channel.h>
 
-namespace tinyev
+namespace ev
 {
 
 class TimerQueue: noncopyable

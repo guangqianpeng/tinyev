@@ -14,7 +14,7 @@
 #include <tinyev/noncopyable.h>
 #include <tinyev/Callbacks.h>
 
-namespace tinyev
+namespace ev
 {
 
 class ThreadPool: noncopyable

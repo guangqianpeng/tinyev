@@ -9,7 +9,7 @@
 #include <tinyev/Logger.h>
 #include <tinyev/EventLoop.h>
 
-using namespace tinyev;
+using namespace ev;
 
 EPoller::EPoller(EventLoop* loop)
         :loop_(loop),

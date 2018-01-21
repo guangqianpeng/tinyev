@@ -5,7 +5,7 @@
 #ifndef TINYEV_NONCOPYABLE_H
 #define TINYEV_NONCOPYABLE_H
 
-namespace tinyev
+namespace ev
 {
 
 class noncopyable

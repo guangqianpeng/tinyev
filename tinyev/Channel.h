@@ -11,7 +11,7 @@
 
 #include <tinyev/noncopyable.h>
 
-namespace tinyev
+namespace ev
 {
 
 class EventLoop;

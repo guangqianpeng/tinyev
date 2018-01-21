@@ -7,7 +7,7 @@
 #include <tinyev/TcpConnection.h>
 #include <tinyev/TcpClient.h>
 
-using namespace tinyev;
+using namespace ev;
 
 TcpClient::TcpClient(EventLoop* loop, const InetAddress& peer)
         : loop_(loop),

@@ -11,7 +11,7 @@
 #include <tinyev/Channel.h>
 #include <tinyev/Timestamp.h>
 
-namespace tinyev
+namespace ev
 {
 
 class Timer: noncopyable

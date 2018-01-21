@@ -16,7 +16,7 @@
 #include <tinyev/Callbacks.h>
 #include <tinyev/noncopyable.h>
 
-namespace tinyev
+namespace ev
 {
 
 class EventLoopThread;

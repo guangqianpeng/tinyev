@@ -11,7 +11,7 @@
 
 #include "Codec.h"
 
-using namespace tinyev;
+using namespace ev;
 
 class KthClient: noncopyable
 {

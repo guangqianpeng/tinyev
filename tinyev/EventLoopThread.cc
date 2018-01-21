@@ -7,7 +7,7 @@
 #include <tinyev/EventLoopThread.h>
 #include <tinyev/EventLoop.h>
 
-using namespace tinyev;
+using namespace ev;
 
 EventLoopThread::EventLoopThread()
         : loop_(nullptr),

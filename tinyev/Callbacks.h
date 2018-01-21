@@ -8,7 +8,7 @@
 #include <memory>
 #include <functional>
 
-namespace tinyev
+namespace ev
 {
 using namespace std::string_view_literals;
 

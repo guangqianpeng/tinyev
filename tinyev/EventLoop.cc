@@ -14,7 +14,7 @@
 #include "Channel.h"
 #include "EventLoop.h"
 
-using namespace tinyev;
+using namespace ev;
 
 namespace
 {

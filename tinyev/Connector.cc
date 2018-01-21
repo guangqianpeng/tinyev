@@ -11,7 +11,7 @@
 #include <tinyev/Logger.h>
 #include <tinyev/Connector.h>
 
-using namespace tinyev;
+using namespace ev;
 
 namespace
 {

@@ -10,7 +10,7 @@
 #include <tinyev/Callbacks.h>
 #include <tinyev/Acceptor.h>
 
-namespace tinyev
+namespace ev
 {
 
 class EventLoop;

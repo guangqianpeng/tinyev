@@ -14,7 +14,7 @@
 #include <tinyev/EPoller.h>
 #include <tinyev/TimerQueue.h>
 
-namespace tinyev
+namespace ev
 {
 
 class EventLoop: noncopyable

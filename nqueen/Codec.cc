@@ -9,7 +9,7 @@
 
 #include "Codec.h"
 
-using namespace tinyev;
+using namespace ev;
 
 namespace
 {

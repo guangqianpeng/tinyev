@@ -8,7 +8,7 @@
 #include <chrono>
 
 
-namespace tinyev
+namespace ev
 {
 
 using std::chrono::system_clock;

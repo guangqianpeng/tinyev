@@ -9,7 +9,7 @@
 #include <tinyev/TcpConnection.h>
 #include <tinyev/TcpServer.h>
 
-using namespace tinyev;
+using namespace ev;
 
 class EchoServer
 {

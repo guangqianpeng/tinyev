@@ -8,7 +8,7 @@
 #include <tinyev/Logger.h>
 #include <tinyev/InetAddress.h>
 
-using namespace tinyev;
+using namespace ev;
 
 InetAddress::InetAddress(uint16_t port, bool loopback)
 {

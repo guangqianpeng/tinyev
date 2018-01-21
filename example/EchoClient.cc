@@ -10,7 +10,7 @@
 #include <tinyev/TcpClient.h>
 #include <tinyev/EventLoop.h>
 
-using namespace tinyev;
+using namespace ev;
 
 class UserInput: noncopyable
 {

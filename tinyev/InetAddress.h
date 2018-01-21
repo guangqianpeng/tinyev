@@ -8,7 +8,7 @@
 #include <string>
 #include <netinet/in.h>
 
-namespace tinyev
+namespace ev
 {
 
 class InetAddress

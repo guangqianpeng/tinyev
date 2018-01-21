@@ -12,7 +12,7 @@
 #include <tinyev/TcpServer.h>
 #include <tinyev/ThreadPool.h>
 
-using namespace tinyev;
+using namespace ev;
 
 class File: noncopyable
 {

@@ -7,7 +7,7 @@
 #include <tinyev/EventLoop.h>
 #include <tinyev/Channel.h>
 
-using namespace tinyev;
+using namespace ev;
 
 Channel::Channel(EventLoop* loop, int fd)
         : polling(false),

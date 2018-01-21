@@ -9,7 +9,7 @@
 #include <tinyev/Connector.h>
 #include <tinyev/Timer.h>
 
-namespace tinyev
+namespace ev
 {
 
 class TcpClient: noncopyable

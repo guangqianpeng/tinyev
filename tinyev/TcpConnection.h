@@ -13,7 +13,7 @@
 #include <tinyev/Channel.h>
 #include <tinyev/InetAddress.h>
 
-namespace tinyev
+namespace ev
 {
 
 class EventLoop;

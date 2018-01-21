@@ -10,7 +10,7 @@
 #include <tinyev/EventLoop.h>
 #include <tinyev/TimerQueue.h>
 
-using namespace tinyev;
+using namespace ev;
 
 namespace
 {

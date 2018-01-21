@@ -9,7 +9,7 @@
 
 #include <tinyev/CountDownLatch.h>
 
-namespace tinyev
+namespace ev
 {
 
 class EventLoop;
