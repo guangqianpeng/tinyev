@@ -19,10 +19,7 @@ set(SOURCE_FILES
         TimerQueue.cc TimerQueue.h
         Timer.h
         Timestamp.h
-        http/HttpContext.h http/HttpContext.cc
-        http/HttpRequest.h http/HttpRequest.cc
-        http/HttpResponse.h http/HttpResponse.cc
-        http/HttpServer.h http/HttpServer.cc)
+        )
 
 add_library(tinyev STATIC ${SOURCE_FILES})
 target_link_libraries(tinyev pthread)
@@ -49,6 +46,5 @@ set(HEADERS
         Timer.h
         TimerQueue.h
         Timestamp.h
-        http/HttpServer.h
         )
 install(FILES ${HEADERS} DESTINATION include)
