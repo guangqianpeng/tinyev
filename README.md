@@ -118,11 +118,12 @@ int main()
 ```shell
 $ git clone git@github.com:guangqianpeng/tinyev.git
 $ cd tinyev
+$ git submodule update --init --recursive
 $ ./build.sh 
-see binary in ../tinyev-build/Release/{bin, lib}
 $ ./build.sh install
-see tinyev headers and library in ../tinyev-build/Release/{include, lib}
 ```
+
+tinyev安装在 `../tinyev-build/Release/{include, lib}`
 
 ## 更多
 
