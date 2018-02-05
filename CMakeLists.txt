@@ -27,7 +27,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(tinyev)
-add_subdirectory(kth_element)
-add_subdirectory(nqueen)
-add_subdirectory(sort)
 add_subdirectory(example)
