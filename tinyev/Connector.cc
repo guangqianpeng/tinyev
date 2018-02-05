@@ -35,7 +35,7 @@ Connector::Connector(EventLoop* loop, const InetAddress& peer)
           started_(false),
           channel_(loop, sockfd_)
 {
-    channel_.setWriteCallback([this](){handleWrtie();});
+    channel_.setWriteCallback([this](){ handleWrite();});
 }
 
 Connector::~Connector()
@@ -53,14 +53,14 @@ void Connector::start()
     int ret = ::connect(sockfd_, peer_.getSockaddr(), peer_.getSocklen());
     if (ret == -1) {
         if (errno != EINPROGRESS)
-            handleWrtie();
+            handleWrite();
         else
             channel_.enableWrite();
     }
-    else handleWrtie();
+    else handleWrite();
 }
 
-void Connector::handleWrtie()
+void Connector::handleWrite()
 {
     loop_->assertInLoopThread();
     assert(started_);

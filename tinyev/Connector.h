@@ -32,7 +32,7 @@ public:
     { errorCallback_ = cb; }
 
 private:
-    void handleWrtie();
+    void handleWrite();
 
     EventLoop* loop_;
     const InetAddress peer_;
