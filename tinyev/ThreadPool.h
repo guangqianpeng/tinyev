@@ -7,6 +7,7 @@
 
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 #include <thread>
 #include <vector>
 #include <deque>
@@ -20,6 +21,7 @@ namespace ev
 class ThreadPool: noncopyable
 {
 public:
+    explicit
     ThreadPool(size_t numThread,
                size_t maxQueueSize = 65536,
                const ThreadInitCallback& cb = nullptr);
@@ -43,7 +45,7 @@ private:
     std::condition_variable notFull_;
     std::deque<Task> taskQueue_;
     const size_t maxQueueSize_;
-    bool running_;
+    std::atomic_bool running_;
     ThreadInitCallback threadInitCallback_;
 };
 
