@@ -117,7 +117,7 @@ int main()
     EchoServer server(&loop, addr, 1, 5s);
     server.start();
 
-    loop.runAfter(1min, [&](){
+    loop.runAfter(10s, [&](){
         int countdown = 5;
         INFO("server quit after %d second...", countdown);
         loop.runEvery(1s, [&, countdown]() mutable {
