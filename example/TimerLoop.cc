@@ -2,8 +2,6 @@
 // Created by frank on 17-11-17.
 //
 
-#include <cstdio>
-
 #include <tinyev/Logger.h>
 #include <tinyev/EventLoop.h>
 

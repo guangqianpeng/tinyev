@@ -10,7 +10,7 @@ target_link_libraries(discard_server tinyev)
 add_executable(chargen_server ChargenServer.cc)
 target_link_libraries(chargen_server tinyev)
 
-add_executable(timer timer.cc)
+add_executable(timer TimerLoop.cc)
 target_link_libraries(timer tinyev)
 
 add_subdirectory(nqueen)
