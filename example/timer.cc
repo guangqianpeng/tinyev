@@ -14,7 +14,7 @@ int main()
     EventLoop loop;
 
     loop.runEvery(1s, [](){
-       INFO("run every 1s");
+        INFO("run every 1s");
     });
     loop.runAfter(10s, [&](){
         INFO("end after 10s");
@@ -23,6 +23,7 @@ int main()
     loop.runAt(Clock::nowAfter(15min), [&](){
         INFO("run 15min later");
     });
-    INFO("start loop");
+
+    INFO("start looping");
     loop.loop();
 }
