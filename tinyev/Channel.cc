@@ -25,6 +25,12 @@ Channel::~Channel()
 void Channel::handleEvents()
 {
     loop_->assertInLoopThread();
+    // channel is always a member of another object
+    // e.g. Timer, Acceptor, TcpConnection
+    // TcpConnection is managed by std::shared_ptr,
+    // and may be destructed when handling events,
+    // so we use weak_ptr->shared_ptr to
+    // extend it's life-time.
     if (tied_) {
         auto guard = tie_.lock();
         if (guard != nullptr)

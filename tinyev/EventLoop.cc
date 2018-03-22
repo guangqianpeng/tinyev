@@ -101,6 +101,10 @@ void EventLoop::queueInLoop(const Task& task)
         std::lock_guard<std::mutex> guard(mutex_);
         pendingTasks_.push_back(task);
     }
+    // if we are not in loop thread, just wake up loop thread to handle new task
+    // if we are in loop thread && doing pending task, wake up too.
+    // note that the following code has race condition:
+    //     if (doingPendingTasks_ || isInLoopThread())
     if (!isInLoopThread() || doingPendingTasks_)
         wakeup();
 }
@@ -161,8 +165,8 @@ void EventLoop::assertNotInLoopThread()
 
 bool EventLoop::isInLoopThread()
 {
-    pid_t x = gettid();
-    return tid_ == x;
+    // tid_ is constant, don't worry about thread safety
+    return tid_ == gettid();
 }
 
 void EventLoop::doPendingTasks()
@@ -170,6 +174,7 @@ void EventLoop::doPendingTasks()
     assertInLoopThread();
     std::vector<Task> tasks;
     {
+        // shorten the critical area by a single swap
         std::lock_guard<std::mutex> guard(mutex_);
         tasks.swap(pendingTasks_);
     }

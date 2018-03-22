@@ -47,7 +47,7 @@ public:
 private:
     void doPendingTasks();
     void handleRead();
-    pid_t tid_;
+    const pid_t tid_;
     bool quit_;
     bool doingPendingTasks_;
     EPoller poller_;
