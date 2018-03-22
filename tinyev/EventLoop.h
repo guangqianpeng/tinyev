@@ -48,14 +48,14 @@ private:
     void doPendingTasks();
     void handleRead();
     const pid_t tid_;
-    bool quit_;
+    std::atomic_bool quit_;
     bool doingPendingTasks_;
     EPoller poller_;
     EPoller::ChannelList activeChannels_;
-    int wakeupFd_;
+    const int wakeupFd_;
     Channel wakeupChannel_;
     std::mutex mutex_;
-    std::vector<Task> pendingTasks_;
+    std::vector<Task> pendingTasks_; // guarded by mutex_
     TimerQueue timerQueue_;
 };
 
