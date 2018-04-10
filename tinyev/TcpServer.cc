@@ -19,7 +19,7 @@ TcpServer::TcpServer(EventLoop* loop, const InetAddress& local)
           connectionCallback_(defaultConnectionCallback),
           messageCallback_(defaultMessageCallback)
 {
-    INFO("TcpServer() %s", local.toIpPort().c_str());
+    INFO("create TcpServer() %s", local.toIpPort().c_str());
 }
 
 TcpServer::~TcpServer()

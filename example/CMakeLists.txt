@@ -13,5 +13,6 @@ target_link_libraries(chargen_server tinyev)
 add_executable(timer TimerLoop.cc)
 target_link_libraries(timer tinyev)
 
+add_subdirectory(echo_bench)
 add_subdirectory(nqueen)
 add_subdirectory(kth_element)

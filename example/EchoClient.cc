@@ -41,15 +41,15 @@ private:
     TcpConnectionPtr conn_;
 };
 
-class EchoClient: noncopyable
+class EchoBench: noncopyable
 {
 public:
-    EchoClient(EventLoop* loop, const InetAddress& addr):
+    EchoBench(EventLoop* loop, const InetAddress& addr):
             loop_(loop),
             client_(loop, addr)
     {
         client_.setConnectionCallback(std::bind(
-                &EchoClient::onConnection, this, _1));
+                &EchoBench::onConnection, this, _1));
     }
     void start()
     { client_.start(); }
@@ -83,7 +83,7 @@ int main()
     setLogLevel(LOG_LEVEL_WARN);
     EventLoop loop;
     InetAddress addr("1.2.3.4", 9877);
-    EchoClient client(&loop, addr);
+    EchoBench client(&loop, addr);
     client.start();
     loop.loop();
 }
