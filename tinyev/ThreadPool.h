@@ -28,6 +28,7 @@ public:
     ~ThreadPool();
 
     void runTask(const Task& task);
+    void runTask(Task&& task);
     void stop();
     size_t numThreads() const
     { return threads_.size(); }

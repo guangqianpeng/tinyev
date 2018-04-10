@@ -14,7 +14,6 @@ ThreadPool::ThreadPool(size_t numThread, size_t maxQueueSize, const ThreadInitCa
           running_(true),
           threadInitCallback_(cb)
 {
-    assert(numThread >= 0);
     assert(maxQueueSize > 0);
     for (size_t i = 1; i <= numThread; ++i) {
         threads_.emplace_back(new std::thread([this, i](){runInThread(i);}));
@@ -44,6 +43,24 @@ void ThreadPool::runTask(const Task& task)
         while (taskQueue_.size() >= maxQueueSize_)
             notFull_.wait(lock);
         taskQueue_.push_back(task);
+        notEmpty_.notify_one();
+    }
+}
+
+void ThreadPool::runTask(Task&& task)
+{
+    assert(running_);
+
+    if (threads_.empty())
+    {
+        task();
+    }
+    else
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        while (taskQueue_.size() >= maxQueueSize_)
+            notFull_.wait(lock);
+        taskQueue_.push_back(std::move(task));
         notEmpty_.notify_one();
     }
 }
