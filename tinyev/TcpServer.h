@@ -30,8 +30,8 @@ public:
 
     TcpServer(EventLoop* loop, const InetAddress& local);
     ~TcpServer();
-    // n==0: all things run in baseLoop thread
-    // n >0: set another n eventLoop threads.
+    // n == 0 || n == 1: all things run in baseLoop thread
+    // n > 1: set another (n - 1) eventLoop threads.
     void setNumThread(size_t n);
     // set all threads begin to loop and accept new connections
     // except the baseLoop thread
