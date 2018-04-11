@@ -84,13 +84,13 @@ public:
 private:
     void expireAfter(const TcpConnectionPtr& conn, Nanosecond interval)
     {
-        connections_[conn] = Clock::nowAfter(interval);
+        connections_[conn] = clock::nowAfter(interval);
     }
 
     void onTimeout()
     {
         for (auto it = connections_.begin(); it != connections_.end(); ) {
-            if (it->second <= Clock::now()) {
+            if (it->second <= clock::now()) {
                 INFO("connection timeout force close");
                 it->first->forceClose();
                 it = connections_.erase(it);

@@ -34,7 +34,7 @@ void timerfdRead(int fd)
 struct timespec durationFromNow(Timestamp when)
 {
     struct timespec ret;
-    Nanosecond ns = when - Clock::now();
+    Nanosecond ns = when - clock::now();
     if (ns < 1ms) ns = 1ms;
 
     ret.tv_sec = static_cast<time_t>(ns.count() / std::nano::den);
@@ -101,7 +101,7 @@ void TimerQueue::handleRead()
     loop_->assertInLoopThread();
     timerfdRead(timerfd_);
 
-    Timestamp now(Clock::now());
+    Timestamp now(clock::now());
     for (auto& e: getExpired(now)) {
         Timer* timer = e.second;
         assert(timer->expired(now));

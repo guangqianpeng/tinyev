@@ -18,7 +18,7 @@ int main()
         INFO("end after 10s");
         loop.quit();
     });
-    loop.runAt(Clock::nowAfter(15min), [&](){
+    loop.runAt(clock::nowAfter(15min), [&](){
         INFO("run 15min later");
     });
 

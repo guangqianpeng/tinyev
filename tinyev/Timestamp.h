@@ -24,7 +24,7 @@ typedef std::chrono::hours         Hour;
 typedef std::chrono::time_point
         <system_clock, Nanosecond> Timestamp;
 
-namespace Clock
+namespace clock
 {
 
 inline Timestamp now()

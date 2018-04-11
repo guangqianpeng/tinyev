@@ -116,13 +116,13 @@ Timer* EventLoop::runAt(Timestamp when, TimerCallback callback)
 
 Timer* EventLoop::runAfter(Nanosecond interval, TimerCallback callback)
 {
-    return runAt(Clock::now() + interval, std::move(callback));
+    return runAt(clock::now() + interval, std::move(callback));
 }
 
 Timer* EventLoop::runEvery(Nanosecond interval, TimerCallback callback)
 {
     return timerQueue_.addTimer(std::move(callback),
-                                Clock::now() + interval,
+                                clock::now() + interval,
                                 interval);
 }
 
