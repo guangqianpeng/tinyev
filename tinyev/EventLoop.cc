@@ -95,6 +95,14 @@ void EventLoop::runInLoop(const Task& task)
         queueInLoop(task);
 }
 
+void EventLoop::runInLoop(Task&& task)
+{
+    if (isInLoopThread())
+        task();
+    else
+        queueInLoop(std::move(task));
+}
+
 void EventLoop::queueInLoop(const Task& task)
 {
     {
@@ -105,6 +113,16 @@ void EventLoop::queueInLoop(const Task& task)
     // if we are in loop thread && doing pending task, wake up too.
     // note that the following code has race condition:
     //     if (doingPendingTasks_ || isInLoopThread())
+    if (!isInLoopThread() || doingPendingTasks_)
+        wakeup();
+}
+
+void EventLoop::queueInLoop(Task&& task)
+{
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        pendingTasks_.push_back(std::move(task));
+    }
     if (!isInLoopThread() || doingPendingTasks_)
         wakeup();
 }

@@ -28,7 +28,9 @@ public:
     void quit(); // thread safe
 
     void runInLoop(const Task& task);
+    void runInLoop(Task&& task);
     void queueInLoop(const Task& task);
+    void queueInLoop(Task&& task);
 
     Timer* runAt(Timestamp when, TimerCallback callback);
     Timer* runAfter(Nanosecond interval, TimerCallback callback);
