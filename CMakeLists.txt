@@ -27,4 +27,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(tinyev)
-add_subdirectory(example)
+if(NOT CMAKE_BUILD_NO_EXAMPLES)
+    add_subdirectory(example)
+endif()
