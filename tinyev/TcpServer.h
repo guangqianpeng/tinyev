@@ -59,7 +59,7 @@ private:
     ThreadPtrList threads_;
     EventLoopList eventLoops_;
     size_t numThreads_;
-    bool started_;
+    std::atomic_bool started_;
     InetAddress local_;
     std::mutex mutex_;
     std::condition_variable cond_;

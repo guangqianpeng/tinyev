@@ -43,9 +43,8 @@ void TcpServer::setNumThread(size_t n)
 
 void TcpServer::start()
 {
-    baseLoop_->assertInLoopThread();
-    assert(!started_);
-    started_ = true;
+    if (started_.exchange(true))
+        return;
 
     INFO("TcpServer::start() %s with %lu eventLoop thread(s)",
          local_.toIpPort().c_str(), numThreads_);
