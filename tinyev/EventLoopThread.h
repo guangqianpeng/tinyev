@@ -17,7 +17,7 @@ class EventLoop;
 class EventLoopThread: noncopyable
 {
 public:
-    EventLoopThread();
+    EventLoopThread() = default;
     ~EventLoopThread();
 
     EventLoop* startLoop();
@@ -25,10 +25,10 @@ public:
 private:
     void runInThread();
 
-
-    EventLoop* loop_;
+    bool started_ = false;
+    EventLoop* loop_ = nullptr;
     std::thread thread_;
-    CountDownLatch latch_;
+    CountDownLatch latch_{1};
 };
 
 }
