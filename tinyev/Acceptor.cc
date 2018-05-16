@@ -26,14 +26,12 @@ int createSocket()
 }
 
 Acceptor::Acceptor(EventLoop* loop, const InetAddress& local)
-        : loop_(loop),
+        : listening_(false),
+          loop_(loop),
           acceptFd_(createSocket()),
           acceptChannel_(loop, acceptFd_),
-          local_(local),
-          listening_(false)
+          local_(local)
 {
-    loop->assertInLoopThread();
-
     int on = 1;
     int ret = ::setsockopt(acceptFd_, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
     if (ret == -1)
@@ -44,13 +42,19 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& local)
     ret = ::bind(acceptFd_, local.getSockaddr(), local.getSocklen());
     if (ret == -1)
         SYSFATAL("Acceptor::bind()");
-    ret = ::listen(acceptFd_, SOMAXCONN);
+}
+
+void Acceptor::listen()
+{
+    loop_->assertInLoopThread();
+    int ret = ::listen(acceptFd_, SOMAXCONN);
     if (ret == -1)
         SYSFATAL("Acceptor::listen()");
 
     acceptChannel_.setReadCallback([this](){handleRead();});
     acceptChannel_.enableRead();
 }
+
 
 Acceptor::~Acceptor()
 {

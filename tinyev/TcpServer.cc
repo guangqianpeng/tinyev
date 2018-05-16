@@ -46,6 +46,11 @@ void TcpServer::start()
     if (started_.exchange(true))
         return;
 
+    baseLoop_->runInLoop([=](){startInLoop();});
+}
+
+void TcpServer::startInLoop()
+{
     INFO("TcpServer::start() %s with %lu eventLoop thread(s)",
          local_.toIpPort().c_str(), numThreads_);
 
@@ -54,6 +59,7 @@ void TcpServer::start()
     baseServer_->setMessageCallback(messageCallback_);
     baseServer_->setWriteCompleteCallback(writeCompleteCallback_);
     threadInitCallback_(0);
+    baseServer_->start();
 
     for (size_t i = 1; i < numThreads_; ++i) {
         auto thread = new std::thread(std::bind(
@@ -65,6 +71,8 @@ void TcpServer::start()
         }
         threads_.emplace_back(thread);
     }
+
+
 }
 
 void TcpServer::runInThread(size_t index)
@@ -83,6 +91,7 @@ void TcpServer::runInThread(size_t index)
     }
 
     threadInitCallback_(index);
+    server.start();
     loop.loop();
     eventLoops_[index] = nullptr;
 }

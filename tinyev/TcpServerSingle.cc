@@ -18,6 +18,11 @@ TcpServerSingle::TcpServerSingle(EventLoop* loop, const InetAddress& local)
             &TcpServerSingle::newConnection, this, _1, _2, _3));
 }
 
+void TcpServerSingle::start()
+{
+    acceptor_.listen();
+}
+
 void TcpServerSingle::newConnection(int connfd,
                                     const InetAddress& local,
                                     const InetAddress& peer)

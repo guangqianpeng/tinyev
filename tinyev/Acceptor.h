@@ -22,6 +22,10 @@ public:
     Acceptor(EventLoop* loop, const InetAddress& local);
     ~Acceptor();
 
+    bool listening() const
+    { return listening_; }
+
+    void listen();
 
     void setNewConnectionCallback(const NewConnectionCallback& cb)
     { newConnectionCallback_ = cb; }
@@ -29,11 +33,11 @@ public:
 private:
     void handleRead();
 
+    bool listening_;
     EventLoop* loop_;
     const int acceptFd_;
     Channel acceptChannel_;
     InetAddress local_;
-    bool listening_;
     NewConnectionCallback newConnectionCallback_;
 };
 

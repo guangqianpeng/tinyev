@@ -47,6 +47,7 @@ public:
     { writeCompleteCallback_ = cb; }
 
 private:
+    void startInLoop();
     void runInThread(size_t index);
 
     typedef std::unique_ptr<std::thread> ThreadPtr;

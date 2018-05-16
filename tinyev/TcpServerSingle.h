@@ -26,6 +26,8 @@ public:
     void setWriteCompleteCallback(const WriteCompleteCallback &cb)
     { writeCompleteCallback_ = cb; }
 
+    void start();
+
 private:
     void newConnection(int connfd, const InetAddress &local, const InetAddress &peer);
 
