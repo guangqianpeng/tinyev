@@ -37,5 +37,4 @@ void EventLoopThread::runInThread()
     loop_ = &loop;
     latch_.count();
     loop.loop();
-    loop_ = nullptr;
 }
