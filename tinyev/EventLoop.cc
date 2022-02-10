@@ -16,7 +16,7 @@
 
 using namespace ev;
 
-namespace
+namespace ev
 {
 
 __thread EventLoop* t_Eventloop = nullptr;
